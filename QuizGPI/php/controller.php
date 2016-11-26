@@ -22,9 +22,12 @@ class Controller
 				case '0':	// Carga el front
 					View::front();
 					break;
-				case '1':
-
+				case '1':   // Carga login
+                    View::login();
 					break;
+                case '2':   // Carga registro
+                    View::register();
+                    break;
 				default:
 					echo "Error. Controller::system(). op=view.";
 					print_r($var);
@@ -39,6 +42,22 @@ class Controller
 				case 'value':
 					
 					break;
+                    
+                case '1':
+                    $ret = Model::loginUser();
+                    if(empty($ret))
+                    {
+                        /**/
+                    }
+                    else
+                    {
+                        View::login($ret);
+                    }
+                    break;
+                    
+                case '2':
+                    Model::registerUser();
+                    break;
 				
 				default:
 					echo "Error. Controller::system(), op=command.";

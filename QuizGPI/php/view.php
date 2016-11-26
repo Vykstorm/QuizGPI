@@ -6,6 +6,30 @@
 class View
 {
 	
+    /* Funcion para añadir mensajes de error a una pagina html */
+    protected static function processMessages($text, $messages)
+    {
+
+        if (strpos($text, '##corteListaErrores##') !== false) {
+            $trozos = explode('##corteListaErrores##', $text);
+        
+            if(is_null($messages) || empty($messages)){
+                $text = $trozos[0].$trozos[2];
+            }else{
+                $aux0 = "";
+                for($i=0; $i<count($messages); $i++) {
+                    $aux1 = $trozos[1];
+                    $aux1 = str_replace("##error##", $messages[$i], $aux1);
+                    $aux0 .= $aux1;
+                }
+                $text = $trozos[0].$aux0.$trozos[2];
+            }
+        }
+        
+        return $text;
+	}
+    
+    
 	/* Función para cargar un fichero html determinado*/
 	protected static function getHtml($name)
 	{
@@ -16,7 +40,12 @@ class View
 			case 'menu':
 				
 				break;
-
+            case 'login':    
+                $path = "html/log.html";
+                break;
+            case 'register':    
+                $path = "html/reg.html";
+                break;
 			default:
 				# code...
 				break;
@@ -34,6 +63,21 @@ class View
 		$text = View::getHtml("front");
 		echo $text;
 	}
+    
+    /* Carga la pagina de login */
+    public static function login($errors = null)
+    {
+        $text = View::getHtml("login");
+        $text = View::processMessages($text, $errors);
+        echo $text;
+    }
+    
+    /* Carga la pagina de login */
+    public static function register()
+    {
+        $text = View::getHtml("register");
+        echo $text;
+    }
 
 	
 
