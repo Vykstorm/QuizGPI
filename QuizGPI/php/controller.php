@@ -28,6 +28,10 @@ class Controller
                 case '2':   // Carga registro
                     View::register();
                     break;
+                    
+                case '3': // Carga juego, pantalla principal
+					View::gameScreen();
+					break;
 				default:
 					echo "Error. Controller::system(). op=view.";
 					print_r($var);
@@ -67,9 +71,10 @@ class Controller
 
 		}// END else if($var["op"] == "command")
 		else
+		{
 			echo "Error. Controller::system()";
-			print_r($var);	
-
+			print_r($var);
+		}
 	}
 
 	/* Inicio de sesion, es privado porque solo el controlador lo va utilizar */
