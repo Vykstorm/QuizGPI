@@ -1,7 +1,5 @@
 <?php
 
-require_once('model.php');
-
 /**
 * 	Clase para gestionar las vistas
 */
@@ -78,31 +76,13 @@ class View
         echo $text;
     }
     
-	/* Carga la página del juego (Pantalla del juego) */
-	/*
-	 * El servidor responderá con un texto en formato JSON
-	 * con la página HTML de la pantalla principal del juego + 
-	 * preguntas que el usuario debe responder
-	 *   
-	 */
-	public static function gameScreen()
-	{
-		$tema = 'aleatorio';
-		$num_preguntas = 5;
-		/* Obtenemos las preguntas */
-		$preguntas = Model::getPreguntas($num_preguntas, $tema) or exit('Fallo al obtener las preguntas: tema=' . $tema . ', num.preguntas=' . $num_preguntas);
-		
-		/* Obtenemos la página HTML de la pantalla del juego */
-		$pagina = View::getHtml('gameScreen');
-		
-		/* Devolvemos la respuesta del servidor: preguntas + página en formato JSON */
-		$respuesta = array('preguntas' => $preguntas, 'pagina' => $pagina);
-		
-		
-		header('Content-type: application/json');
-		$text = json_encode($respuesta);
-		echo $text;
+    /* Carga la pantalla del juego */
+    public static function gameScreen()
+    {
+		$text = View::getHtml('gameScreen');
+		return $text;
 	}
+
     
     /* Carga la pagina de login */
     public static function register()
