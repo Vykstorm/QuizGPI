@@ -53,6 +53,41 @@ class Model
     {
     
     }
+
+    /* Devuelve las preguntas para iniciar la partida en un array.
+       Como parámetro recive numero de preguntas y el tema. 
+       n > 0, t = <un_tema_de_bbdd> <aleatorio> */       
+    public static function getPreguntas($n, $t){
+
+    	if($n > 0)
+    	{    		
+    		if($result = Facade::getPreguntas($n, $t))
+    		{
+    			$data   = array();
+
+	    		while ($row = mysqli_fetch_array($result))
+	    		{
+	    			$a = array("id" => $row["id"], "tema" => $row["tema"], 
+	    				"p" => $row["pregunta"], "r1" => $row["respuesta1"],
+	    				"r2" => $row["respuesta2"], "r3" => $row["respuesta3"],
+	    				"r4" => $row["respuesta4"], "c" => $row["correcta"]);
+
+	    			$data = array_push($data, $a);
+	    		}
+
+	    		return $data;
+    		}
+    		else
+    		{
+    			return false;
+    		}
+    		
+    	}
+    	else
+    	{
+    		return false;
+    	}    	
+    }
     
 }
 ?>

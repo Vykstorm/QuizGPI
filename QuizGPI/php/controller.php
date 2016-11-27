@@ -58,7 +58,7 @@ class Controller
                 case '2':
                     Model::registerUser();
                     break;
-				
+								
 				default:
 					echo "Error. Controller::system(), op=command.";
 					print_r($var);
