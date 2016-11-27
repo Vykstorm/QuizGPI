@@ -29,5 +29,29 @@ class Facade
 		return DataBase::execute($query);
 	}
     
+    /* Devuleve n preguntas del tema t*/
+    public static function getPreguntas($n, $t)
+    {
+    	// Comprueba si existe el tema t en la bbdd
+    	$query = "SELECT count(*) n FROM temas WHERE nombre = '".$t."'";
+    	$result = DataBase::execute($query);
+		$row = mysqli_fetch_array();
+
+		if($row["n"] == 1) // Existe el tema en la bbdd
+		{
+			// Selecciona n filas aleatorias de la tabla preguntas del tema t
+			$query = "SELECT * 
+			FROM preguntas 
+			WHERE RAND()<(SELECT ((3/COUNT(*))*10) FROM preguntas) and tema = '".$t."' 
+			ORDER BY RAND() 
+			LIMIT '".$n."'";
+
+			return DataBase::execute($query);
+		}
+		else // No existe el tema en la bbdd
+		{
+			return false;
+		}
+    }
 }
 ?>
