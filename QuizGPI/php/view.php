@@ -98,6 +98,8 @@ class View
 		/* Devolvemos la respuesta del servidor: preguntas + página en formato JSON */
 		$respuesta = array('preguntas' => $preguntas, 'pagina' => $pagina);
 		
+		
+		header('Content-type: application/json');
 		$text = json_encode($respuesta);
 		echo $text;
 	}
