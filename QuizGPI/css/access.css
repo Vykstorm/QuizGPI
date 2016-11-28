@@ -1,0 +1,27 @@
+.login-form {
+    width: 25rem;
+    height: 22rem;
+    position: fixed;
+    top: 50%;
+    margin-top: -11rem;
+    left: 50%;
+    margin-left: -12.5rem;
+    background-color: #ffffff;
+    opacity: 0;
+    -webkit-transform: scale(.8);
+    transform: scale(.8);
+}
+
+.register-form {
+    width: 25rem;
+    height: 22rem;
+    position: fixed;
+    top: 50%;
+    margin-top: -11rem;
+    left: 50%;
+    margin-left: -12.5rem;
+    background-color: #ffffff;
+    opacity: 0;
+    -webkit-transform: scale(.8);
+    transform: scale(.8);
+}

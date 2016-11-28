@@ -6,39 +6,42 @@
 
     <title>Login</title>
 
-    <link href="../css/login.css" rel="stylesheet">
+    <link href="../css/access.css" rel="stylesheet">
     <link href="../css/metro.min.css" rel="stylesheet">
     <link href="../css/metro-icons.min.css" rel="stylesheet">
     <link href="../css/metro-responsive.min.css" rel="stylesheet">
 
     <script src="../js/jquery-3.1.1.min.js"></script>
     <script src="../js/metro.min.js"></script>
-    <script src="../js/login.js"></script>
+    <script src="../js/access.js"></script>
 
 </head>
 <body class="bg-darkTeal">
     <div class="login-form padding20 block-shadow">
-        <form action = "../php/controller.php?op=command&id=1" method="POST">
+        <form action = "../index.php?op=command&id=1" method="POST">
             <h1 class="text-light">Entrar a QuizGPI</h1>
             <hr class="thin"/>
             <br />
+            <br />
             <div class="input-control text full-size" data-role="input">
                 <label for="user_login">Nombre de usuario:</label>
-                <input type="text" name="user_login" id="user_login">
+                <input type="text" name="user_login" id="user_login" required>
                 <button class="button helper-button clear"><span class="mif-cross"></span></button>
             </div>
             <br />
             <br />
+            <br />
             <div class="input-control password full-size" data-role="input">
                 <label for="user_password">Contraseña:</label>
-                <input type="password" name="user_password" id="user_password">
+                <input type="password" name="user_password" id="user_password" required>
                 <button class="button helper-button reveal"><span class="mif-looks"></span></button>
             </div>
             <br />
             <br />
+            <br />
             <div class="form-actions">
                 <button type="submit" class="button primary">Entrar</button>
-                <button type="button" class="button link">Registrarse</button>
+                <a href="../index.php?op=view&id=2" class="button link">Registrarse</a>
             </div>
         </form>
     </div>

@@ -73,9 +73,10 @@ class View
     }
     
     /* Carga la pagina de login */
-    public static function register()
+    public static function register($errors = null)
     {
         $text = View::getHtml("register");
+        $text = View::processMessages($text, $errors);
         echo $text;
     }
 
