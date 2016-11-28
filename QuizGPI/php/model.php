@@ -27,13 +27,13 @@ class Model
 			$password  = filter_var($_POST["user_password"], FILTER_SANITIZE_STRING);
 			
             //Connect with the DB and check if a user with this credentials exists            
-			if(mysqli_num_rows(Facade::getUser($name, $password))> 0)
+			if(mysqli_num_rows(Facade::getUser($name, md5($password)))> 0)
             {
                 //Set the session variables
                 $result = Facade::getUser($name, $password);
 				$data = mysqli_fetch_array($result);
 				Session::setVar("userID", $data["id"]);
-				Session::setVar("userNick", $userNick);
+				Session::setVar("userName", $name);
 			}
             else 
             {       
@@ -49,10 +49,50 @@ class Model
 
 	}
     
-    public static function registerUser()
-    {
+    public static function registerUser(){
     
-    }
+        //Array para guardar los posibles errores que encontremos
+        $return = array(); 
+    
+		if(isset($_POST["user_login"]) && isset($_POST["user_password"]) && isset($_POST["user_password2"])){
+            
+            // Validar las entradas
+			$name  = filter_var($_POST["user_login"],FILTER_SANITIZE_STRING);
+			$pwd1 = filter_var($_POST["user_password"],FILTER_SANITIZE_STRING);
+			$pwd2  = filter_var($_POST["user_password2"],FILTER_SANITIZE_STRING);
+            
+            // Comprobar que las contraseñas son iguales
+            if($pwd1 != $pwd2){
+                array_push($return, "Las contraseñas no coinciden.");
+                return $return;
+            }
+
+            // Comprobar si el usuario ya existe
+			if(Facade::existsUser($name)){
+				array_push($return, "Lo sentimos, el nombre de usuario ya existe.");
+                return $return;
+			}		
+            
+            // Insertar el nuevo usuario
+            if(!Facade::addUser($name, md5($pwd1))){
+                array_push($return, "Se ha producido un error con la BBDD");
+                return $return;
+            }
+
+            // Si todo se ha ejecutado correctamente, configurar sesion
+            $result = Facade::getUser($name, $pwd1);
+            $data = mysqli_fetch_array($result);
+            Session::setVar("userID", $data["id"]);
+			Session::setVar("userName", $name);	
+			
+		}else {
+			array_push($return, "No se han proporcionado todos los datos necesarios.");
+		}		
+        
+        //Devolvemos los datos y los reportes de errores (si hay)
+        return $return;
+
+	}
 
     /* Devuelve las preguntas para iniciar la partida en un array.
        Como parámetro recive numero de preguntas y el tema. 

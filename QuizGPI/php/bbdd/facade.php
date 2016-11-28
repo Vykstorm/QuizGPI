@@ -16,7 +16,7 @@ class Facade
 		$result = DataBase::execute($query);
 	}
     
-    public static function existsUser($name, $password)
+    public static function existsUser($name)
 	{
 		$query = "SELECT name FROM users WHERE name='".$name."'";  
 		$result = DataBase::execute($query);
@@ -28,6 +28,12 @@ class Facade
 		$query = "SELECT id, name FROM users WHERE name='".$name."' and password='".$password."'";  
 		return DataBase::execute($query);
 	}
+    
+    public static function addUser($name, $password)
+    {
+        $query = "INSERT INTO users (name, password) VALUES ('".$name."', '".$password."')";  
+        return DataBase::execute($query);
+    }
     
     /* Devuleve n preguntas del tema t*/
     public static function getPreguntas($n, $t)

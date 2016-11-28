@@ -43,20 +43,16 @@ class Controller
 					
 					break;
                     
-                case '1':
+                case '1': // Login
                     $ret = Model::loginUser();
-                    if(empty($ret))
-                    {
-                        /**/
-                    }
-                    else
-                    {
-                        View::login($ret);
-                    }
+                    if(empty($ret)) { View::front(); }
+                    else{ View::login($ret); }
                     break;
                     
-                case '2':
-                    Model::registerUser();
+                case '2': // Register
+                    $ret = Model::registerUser();
+                    if(empty($ret)) { View::front(); }
+                    else{ View::register($ret); }
                     break;
 								
 				default:
