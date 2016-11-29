@@ -1,35 +1,47 @@
+/**
+ * 
+ * 
+ * Este script define la lógica del juego Quizz 
+ */ 
+
 
 $(document).ready(function() { 
-	var preguntas;
-
-	siguiente_pregunta = function() { 
-		if (preguntas.len == 0) { 
-			// Que ocurre si no hay más preguntas ? 
-		}
-		else { 
-			pregunta = preguntas[preguntas.length-1];
-			preguntas.pop();
-			
-			$("#pregunta").text(pregunta.p);
-			$("#r1").text(pregunta.r1);
-			$("#r2").text(pregunta.r2);
-			$("#r3").text(pregunta.r3);
-			$("#r4").text(pregunta.r4);
-		}
-	}
-	
+	// TODO...
+	$("#pantalla_juego").hide() 
 	$("#jugar").click(function() { 
-		$.getJSON('/index.php',
-			{op:'view', id:'3'},
-			function(response) { 
-				// Cargamos la pantalla del juego.
-				$("#pantalla_juego").append(response.pagina);
-				$("#pantalla_juego").append("<button onclick=\"siguiente_pregunta();\">Siguiente pregunta (Para probar)</button>");
+		comenzar_juego(function() { 
+			$("#resultado").hide();
+			$("#jugar").hide();
+			// Añadimos manejadores a los botones de las respuestas.
+			responder = function() { 
+				if(responder_pregunta($(this).attr("id"))) { 
+					$("#resultado").text("!Respuesta correcta!"); 
+				}
+				else { 
+					$("#resultado").text("Respuesta incorrecta motherfucker");
+				}
+				$("#resultado").fadeIn(400).delay(1000).fadeOut(400);
 				
-				preguntas = response.preguntas;
+				setTimeout(function() { 
+					if(!siguiente_pregunta()) { 
+						$("#r1").unbind();
+						$("#r2").unbind();
+						$("#r3").unbind();
+						$("#r4").unbind();
+						$("#pantalla_juego").fadeOut(2000);
+						fin_juego(function() { 
+							$("#pantalla_juego").hide();
+							$("#pantalla_juego").fadeIn(1000);
+							})
+					}
+				}, 2000);
+			}			
+			$("#r1").click(responder);
+			$("#r2").click(responder);
+			$("#r3").click(responder);
+			$("#r4").click(responder);
 				
-				// Imprimimos la primera pregunta
-				siguiente_pregunta();
-			});
-	});
-});
+			$("#pantalla_juego").fadeIn(1000)
+			})
+		})
+	})

@@ -32,6 +32,9 @@ class Controller
                 case '3': // Carga juego, pantalla principal
 					Controller::gameScreen();
 					break;
+				case '4': // Carga juego, pantalla de postpartido
+					View::postPartido(); 
+					break;
 				default:
 					echo "Error. Controller::system(). op=view.";
 					print_r($var);
@@ -62,6 +65,8 @@ class Controller
                 case '2':
                     Model::registerUser();
                     break;
+				case '3': //Gestionar manejo de usuarios & partidas
+					break;
 								
 				default:
 					echo "Error. Controller::system(), op=command.";
