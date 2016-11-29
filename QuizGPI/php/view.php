@@ -46,6 +46,13 @@ class View
             case 'register':    
                 $path = "html/reg.html";
                 break;
+                
+            case 'gameScreen':
+				$path = 'html/game.html';
+				break;
+			case 'postPartido':
+				$path = 'html/postpartido.html';
+				break;
 			default:
 				# code...
 				break;
@@ -72,6 +79,19 @@ class View
         echo $text;
     }
     
+    /* Carga la pantalla del juego */
+    public static function gameScreen()
+    {
+		$text = View::getHtml('gameScreen');
+		return $text;
+	}
+
+	/* Carga la pantalla de postpartido */
+	public static function postPartido() { 
+		$text = View::getHtml('postPartido');
+		echo $text;
+	}
+		
     /* Carga la pagina de login */
     public static function register($errors = null)
     {
@@ -80,7 +100,6 @@ class View
         echo $text;
     }
 
-	
 
 
 }
