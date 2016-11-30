@@ -14,30 +14,42 @@ class Controller
 	{
 		// Iniciamos la sesion
 		Controller::initSession();
+        
+        if(!checkSession()){
+            if($var["id"] == '1')
+            {
+                View::login();
+            }
+            elseif($var["id"] == '2')
+            {
+                View::register();
+            }
+            
+            return;
+        }
 
 		if($var["op"] == "view")
 		{
+                   
 			switch ($var["id"]) 
 			{
-				case '0':	// Carga el front
-					View::front();
-					break;
 				case '1':   // Carga login
                     View::login();
 					break;
                 case '2':   // Carga registro
                     View::register();
                     break;
-                    
                 case '3': // Carga juego, pantalla principal
 					Controller::gameScreen();
 					break;
 				case '4': // Carga juego, pantalla de postpartido
 					View::postPartido(); 
 					break;
-					
 				case '5': // Carga la pagina de ranking
 					Controller::ranking();
+					break;
+                case '6':	// Carga el menu
+                    View::menu();
 					break;
 				default:
 					echo "Error. Controller::system(). op=view.";
@@ -129,6 +141,19 @@ class Controller
 	{
 		Session::init();
 	}
+    
+    
+    private static function checkSession()
+    {
+        if(isset($_SESSION["userID"]) && isset($_SESSION["userName"]))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
 	
 

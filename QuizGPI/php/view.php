@@ -34,19 +34,15 @@ class View
 	protected static function getHtml($name)
 	{
 		switch ($name) {
-			case 'front':
-				$path = "html/front.html";
-				break;
 			case 'menu':
-				
+				$path = "html/menu.html";
 				break;
             case 'login':    
                 $path = "html/log.html";
                 break;
             case 'register':    
                 $path = "html/reg.html";
-                break;
-                
+                break;   
             case 'gameScreen':
 				$path = 'html/game.html';
 				break;
@@ -65,11 +61,11 @@ class View
 	}
 
 	/* Carga la página de inicio */
-	public static function front()
+	public static function menu()
 	{
 		// Tener en cuenta sesion de usuario
     	// Cargar datos dinámicamente
-		$text = View::getHtml("front");
+		$text = View::getHtml("menu");
 		echo $text;
 	}
     
