@@ -29,10 +29,10 @@ class Model
 			if(mysqli_num_rows(Facade::getUser($name, md5($password)))> 0)
             {
                 //Set the session variables
-                $result = Facade::getUser($name, $password);
+                $result = Facade::getUser($name, md5($password));
 				$data = mysqli_fetch_array($result);
-				Session::setVar("userID", $data["id"]);
-				Session::setVar("userName", $name);
+                Session::setVar("userID", $data["id"]);
+                Session::setVar("userName", $name);
 			}
             else 
             {       
