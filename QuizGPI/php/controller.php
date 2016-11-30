@@ -35,6 +35,10 @@ class Controller
 				case '4': // Carga juego, pantalla de postpartido
 					View::postPartido(); 
 					break;
+					
+				case '5': // Carga la pagina de ranking
+					Controller::ranking();
+					break;
 				default:
 					echo "Error. Controller::system(). op=view.";
 					print_r($var);
@@ -92,7 +96,7 @@ class Controller
 		$num_preguntas = 5;
 		/* Obtenemos las preguntas */
 		$preguntas = Model::getPreguntas($num_preguntas, $tema) or exit('Fallo al obtener las preguntas: tema=' . $tema . ', num.preguntas=' . $num_preguntas);
-		
+
 		/* Obtenemos la página HTML de la pantalla del juego */
 		$pagina = View::gameScreen();
 		
@@ -103,6 +107,21 @@ class Controller
 		header('Content-type: application/json');
 		$text = json_encode($respuesta);
 		echo $text;
+	}
+	
+	/**
+	 * Carga la página del ranking de puntuaciones.
+	 */
+	public static function ranking()
+	{
+		/* Obtenemos el ranking de puntuaciones */
+		$n = 10; // Tamaño máximo del ranking
+		$ranking = Model::getRanking($n) or exit('Fallo al obtener el ranking');
+
+		
+		/* Mostramos la pagina */
+		View::ranking($ranking);
+		
 	}
 
 	/* Inicio de sesion, es privado porque solo el controlador lo va utilizar */

@@ -98,7 +98,6 @@ class Model
        Como parámetro recive numero de preguntas y el tema. 
        n > 0, t = <un_tema_de_bbdd> <aleatorio> */       
     public static function getPreguntas($n, $t){
-
     	if($n > 0)
     	{    		
     		if($result = Facade::getPreguntas($n, $t))
@@ -129,5 +128,14 @@ class Model
     	}    	
     }
     
+    /**
+     * Devuelve un array con las n mejores puntuaciones del juego.
+     * El valor de retorno debe ser un array. Cada elemento del array es un
+     * array asociativo con la siguiente estructura: array('j' => nombre_jugador, 'p' => puntuacion);
+     * El array debe estar ordenado en orden decreciente en función de sus puntuaciones.
+     */
+    public static function getRanking($n) { 
+		return array();
+	}
 }
 ?>

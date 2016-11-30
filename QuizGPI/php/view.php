@@ -53,6 +53,8 @@ class View
 			case 'postPartido':
 				$path = 'html/postpartido.html';
 				break;
+			case 'ranking':
+				$path =  'html/ranking.html';
 			default:
 				# code...
 				break;
@@ -100,7 +102,33 @@ class View
         echo $text;
     }
 
-
+	/* Carga la página de ranking */
+	public static function ranking($ranking)
+	{
+		/* Obtenemos la página */
+		$pagina = View::getHtml('ranking');
+			
+		/* Maquetamos la página */
+		$trozos = explode('~~RANK~~', $pagina);
+		
+		/* Creamos una fila por cada jugador en el ranking */
+		$filas = array();
+		$posicion = 1;
+		foreach($ranking as $rank) {
+			$fila = $trozos[1];
+			 
+			foreach(array('#posicion#' => $posicion, '#jugador#' => $rank['j'], '#puntuacion#' => $rank['p']) as $etiqueta => $reemplazo) { 
+					$fila = str_replace($etiqueta, $reemplazo, $fila);
+			}
+			array_push($filas,$fila);
+			$posicion = $posicion + 1;
+		}
+			
+		$trozos[1] = implode('', $filas);
+		$texto = implode('', $trozos);
+		
+		echo $texto;
+	}
 
 }
 ?>

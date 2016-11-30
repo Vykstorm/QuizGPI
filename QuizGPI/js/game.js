@@ -149,4 +149,24 @@ $(document).ready(function() {
 				
 			})
 	}
+	
+	/**
+	 * Este método puede invocarse para ver el ranking de mejores puntuaciones.
+	 * Realiza la petición GET: /index.php?op=view&id=5 
+	 * 
+	 * Finalmente se invoca el callback que se pasa como parámtro cuando la pantalla
+	 * de ranking esté lista.
+	 */
+	ver_ranking = function(callback) { 
+		$.get('/index.php',
+			{op:'view', id:'5'},
+			function(pagina) { 
+				// Cargamos la pantalla del ranking
+				$("#pantalla_juego").html(pagina);
+	
+				if(jQuery.type(callback) == "function") { 
+					callback();
+				}
+			});
+	}
 });

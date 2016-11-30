@@ -32,6 +32,12 @@ $(document).ready(function() {
 						fin_juego(function() { 
 							$("#pantalla_juego").hide();
 							$("#pantalla_juego").fadeIn(1000);
+							$("#ver_ranking").click(function() {
+								$("#pantalla_juego").hide();
+								ver_ranking(function() { 
+									$("#pantalla_juego").fadeIn(500);
+									});
+								})
 							})
 					}
 				}, 2000);
