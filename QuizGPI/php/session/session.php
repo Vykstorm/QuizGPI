@@ -16,7 +16,11 @@ class Session
 	}
 
 	public static function getVar($name){
-		return $_SESSION[$name];
+        if(isset($_SESSION[$name])){
+            return $_SESSION[$name];
+        }else{
+            return false;
+        }
 	}
 
 	public static function unsetVar($name){

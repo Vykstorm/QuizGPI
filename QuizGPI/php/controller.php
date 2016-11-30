@@ -3,8 +3,8 @@
 // Modelo y vista
 require_once('model.php');
 require_once('view.php'); 
+include('session/session.php'); // Manejo de sesiones
 
-require_once('session/session.php'); // Manejo de sesiones
 
 class Controller
 {
@@ -15,18 +15,25 @@ class Controller
 		// Iniciamos la sesion
 		Controller::initSession();
         
-        if(!checkSession()){
-            if($var["id"] == '1')
-            {
-                View::login();
-            }
-            elseif($var["id"] == '2')
+        /*if(Controller::checkSession() == false){
+            echo "puta false";
+        }
+        else{
+            echo "puta true"; 
+        }*/
+
+        /*if(Controller::checkSession() == false){
+            if($var["id"] == '2')
             {
                 View::register();
             }
+            else
+            {
+                View::login();
+            }
             
             return;
-        }
+        }*/
 
 		if($var["op"] == "view")
 		{
@@ -68,13 +75,13 @@ class Controller
                     
                 case '1': // Login
                     $ret = Model::loginUser();
-                    if(empty($ret)) { View::front(); }
+                    if(empty($ret)) { header("Location:index.php?op=view&id=6"); }
                     else{ View::login($ret); }
                     break;
                     
                 case '2': // Register
                     $ret = Model::registerUser();
-                    if(empty($ret)) { View::front(); }
+                    if(empty($ret)) { header("Location:index.php?op=view&id=6"); }
                     else{ View::register($ret); }
                     break;
 				case '3': //Gestionar manejo de usuarios & partidas
