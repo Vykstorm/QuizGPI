@@ -2,7 +2,6 @@
 
 require_once('bbdd/facade.php'); // Interfaz para acceso a la bbbd
 require_once('excel/excel.php');
-require_once('session/session.php'); // Manejo de sesiones
 
 /*
 *	Clase para gestionar los datos de la aplicación.

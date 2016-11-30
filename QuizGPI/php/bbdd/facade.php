@@ -39,16 +39,16 @@ class Facade
     public static function getPreguntas($n, $t)
     {
     	// Comprueba si existe el tema t en la bbdd
-    	$query = "SELECT count(*) n FROM temas WHERE nombre = '".$t."'";
+    	$query = "SELECT count(*) n FROM Tema WHERE nombre = '".$t."'";
     	$result = DataBase::execute($query);
-		$row = mysqli_fetch_array();
+		$row = mysqli_fetch_array($result);
 
 		if($row["n"] == 1) // Existe el tema en la bbdd
 		{
 			// Selecciona n filas aleatorias de la tabla preguntas del tema t
 			$query = "SELECT * 
-			FROM preguntas 
-			WHERE RAND()<(SELECT ((3/COUNT(*))*10) FROM preguntas) and tema = '".$t."' 
+			FROM Pregunta 
+			WHERE RAND()<(SELECT ((3/COUNT(*))*10) FROM Pregunta) and tema = '".$t."' 
 			ORDER BY RAND() 
 			LIMIT '".$n."'";
 
