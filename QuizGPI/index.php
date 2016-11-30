@@ -4,7 +4,7 @@
 
 	// Inicializamos los parametros de inicio
 	$op = 'view';   // Opcion que vamos a elegir view o command
-	$id = 0;	    
+	$id = 1;	    
 	$ac = 'front';	// Accion que vamos a realizar list(), add(), play(), ...
 
 	if (isset($_GET["op"]))			$op = $_GET["op"];

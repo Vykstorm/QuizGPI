@@ -18,20 +18,20 @@ class Facade
     
     public static function existsUser($name)
 	{
-		$query = "SELECT name FROM users WHERE name='".$name."'";  
+		$query = "SELECT name FROM Usuario WHERE name='".$name."'";  
 		$result = DataBase::execute($query);
         return mysqli_num_rows($result)> 0 ? True: False;
 	}
     
     public static function getUser($name, $password)
 	{
-		$query = "SELECT id, name FROM users WHERE name='".$name."' and password='".$password."'";  
+		$query = "SELECT id, name FROM Usuario WHERE name='".$name."' and password='".$password."'";  
 		return DataBase::execute($query);
 	}
     
     public static function addUser($name, $password)
     {
-        $query = "INSERT INTO users (name, password) VALUES ('".$name."', '".$password."')";  
+        $query = "INSERT INTO Usuario (name, password) VALUES ('".$name."', '".$password."')";  
         return DataBase::execute($query);
     }
     
