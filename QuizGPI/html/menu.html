@@ -1,12 +1,39 @@
-
+<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<script src="/js/jquery-3.1.1.min.js"></script>
-		<script src="/js/game.js"></script>
-		<script src="/js/quizz.js"></script>
+		<meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <title>Menu</title>
+        
+        <link href="../css/menu.css" rel="stylesheet">
+        <link href="../css/metro.min.css" rel="stylesheet">
+        <link href="../css/metro-icons.min.css" rel="stylesheet">
+        <link href="../css/metro-responsive.min.css" rel="stylesheet">
+
+        <script src="../js/jquery-3.1.1.min.js"></script>
+        <script src="../js/metro.min.js"></script>
+        <script src="../js/game.js"></script>
+		<script src="../js/quizz.js"></script>
 	</head>
-	<body>
-		<button id="jugar">Jugar!</button>
-		<div id="pantalla_juego"></div>
+	<body class="bg-lightRed">
+        <div class="menu-form padding20 block-shadow">
+        
+            <img src="../images/logo.png" alt="QuizGPI"/>
+            <h1 class="align-center">Bienvenid@ ##USUARIO##</h1>
+            
+            <div class="grid">
+                <div class="row cells2">
+                    <div class="cell"><a class="button success text-shadow" id="jugar">Un Jugador</a></div>
+                    <div class="cell"><a class="button warning text-shadow" id="jugar2">Dos Jugadores</a></div>
+                </div>
+                <div class="row cells2">
+                    <div class="cell"><a class="button info text-shadow" id="ranking">Ranking</a></div>
+                    <div class="cell"><a class="button danger text-shadow" id="salir">Salir</a></div>
+                </div>
+            </div>
+
+            <div id="pantalla_juego"></div>
+        </div>
 	</body>
 </html>

@@ -61,11 +61,12 @@ class View
 	}
 
 	/* Carga la página de inicio */
-	public static function menu()
+	public static function menu($username)
 	{
 		// Tener en cuenta sesion de usuario
-    	// Cargar datos dinámicamente
-		$text = View::getHtml("menu");
+        $text = View::getHtml("menu");
+        $text = str_replace("##USUARIO##", $username, $text); 
+		
 		echo $text;
 	}
     

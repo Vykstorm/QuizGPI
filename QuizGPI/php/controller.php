@@ -26,11 +26,11 @@ class Controller
         /*if(Controller::checkSession() == false){
             if($var["id"] == '2')
             {
-                View::register();
+                header("Location:index.php?op=view&id=2");
             }
             else
             {
-                View::login();
+                header("Location:index.php?op=view&id=1");
             }
             
             return;
@@ -40,9 +40,6 @@ class Controller
 		{
 			switch ($var["id"]) 
 			{
-				case '0':	// Carga el front
-					View::front();
-					break;
 				case '1':   // Carga login
                     View::login();
 					break;
@@ -56,9 +53,12 @@ class Controller
 				case '4': // Carga juego, pantalla de postpartido
 					View::postPartido(); 
 					break;
-					
 				case '5': // Carga la pagina de ranking
 					Controller::ranking();
+					break;
+                case '6':	// Carga el menu
+                    $name = Session::getVar('userName');
+					View::menu($name);
 					break;
 				default:
 					echo "Error. Controller::system(). op=view.";
@@ -150,8 +150,18 @@ class Controller
 	{
 		Session::init();
 	}
-
-	
+    
+    public static function checkSession()
+    {
+        if(Session::getVar('userID') && Session::getVar('userName'))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+	}
 
 }
 

@@ -1,0 +1,53 @@
+.menu-form {
+    width: 30rem;
+    height: 28rem;
+    position: fixed;
+    top: 50%;
+    margin-top: -14rem;
+    left: 50%;
+    margin-left: -15rem;
+    background-color: #ffffff;
+}
+
+img{
+    width: 130px;
+    height: 130px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+h1{
+    font-size: 30px;
+}
+
+a{
+    display: inline-block;
+    width: 100%; 
+    text-transform: uppercase;
+}
+
+.grid{
+    margin-top: 70px !important;
+}
+
+.cell{
+    margin-top: 30px !important;
+    padding: 0 20px !important;
+}
+
+#jugar:hover{
+    box-shadow:0 0 28px 0 rgba(0,128,0,.9);
+}
+
+#jugar2:hover{
+    box-shadow:0 0 28px 0 rgba(255,165,0,.9);
+}
+
+#ranking:hover{
+    box-shadow:0 0 28px 0 rgba(89,205,226,.9);
+}
+
+#salir:hover{
+    box-shadow:0 0 28px 0 rgba(128,0,0,.9);
+}
