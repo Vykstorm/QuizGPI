@@ -17,10 +17,10 @@ class Controller
 
         
         /*if(Controller::checkSession() == false){
-            echo "puta false";
+            echo "session false";
         }
         else{
-            echo "puta true"; 
+            echo "session true"; 
         }*/
 
         /*if(Controller::checkSession() == false){
@@ -86,9 +86,15 @@ class Controller
                     if(empty($ret)) { header("Location:index.php?op=view&id=6"); }
                     else{ View::register($ret); }
                     break;
+                    
 				case '3': //Gestionar manejo de usuarios & partidas
 					break;
-								
+					
+                case '4':
+                    Session::destroy();
+                    header("Location:index.php?op=view&id=1");
+                    break;
+                
 				default:
 					echo "Error. Controller::system(), op=command.";
 					print_r($var);
