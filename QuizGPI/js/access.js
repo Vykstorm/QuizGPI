@@ -1,5 +1,14 @@
 $(function(){
 
+    /************** BOTH ****************/
+    $('.errorMessage').each(function(i, obj) {
+        $.Notify({
+                caption: 'Error',
+                content: $(this).text(),
+                type: 'alert'
+        });
+    });
+
     /************** LOGIN ***************/
     $(".login-form").css({
         opacity: 1,

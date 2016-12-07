@@ -25,3 +25,7 @@
     -webkit-transform: scale(.8);
     transform: scale(.8);
 }
+
+.errorMessage{
+    display: none;
+}
