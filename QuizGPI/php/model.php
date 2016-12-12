@@ -79,10 +79,10 @@ class Model
             }
 
             // Si todo se ha ejecutado correctamente, configurar sesion
-            $result = Facade::getUser($name, $pwd1);
+            $result = Facade::getUser($name, md5($pwd1));
             $data = mysqli_fetch_array($result);
             Session::setVar("userID", $data["id"]);
-			Session::setVar("userName", $name);	
+			Session::setVar("userName", $name);          
 			
 		}else {
 			array_push($return, "No se han proporcionado todos los datos necesarios.");
