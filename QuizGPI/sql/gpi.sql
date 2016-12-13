@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 13, 2016 at 02:19 PM
+-- Generation Time: Dec 13, 2016 at 03:15 PM
 -- Server version: 5.7.16-0ubuntu0.16.04.1
 -- PHP Version: 7.0.8-0ubuntu0.16.04.3
 
@@ -33,6 +33,22 @@ CREATE TABLE `Partida` (
   `puntuacion1` int(3) NOT NULL,
   `puntuacion2` int(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;
+
+--
+-- Dumping data for table `Partida`
+--
+
+INSERT INTO `Partida` (`id`, `usuario1`, `usuario2`, `puntuacion1`, `puntuacion2`) VALUES
+(1, 1, 2, 30, 50),
+(2, 1, 3, 30, 50),
+(3, 1, 2, 30, 50),
+(4, 1, 3, 30, 50),
+(5, 5, 2, 30, 80),
+(6, 7, 3, 60, 20),
+(7, 7, 2, 10, 80),
+(8, 3, 3, 10, 20),
+(9, 8, 2, 30, 60),
+(10, 2, 3, 40, 20);
 
 -- --------------------------------------------------------
 
@@ -175,6 +191,26 @@ INSERT INTO `Pregunta` (`id`, `tema`, `pregunta`, `respuesta1`, `respuesta2`, `r
 -- --------------------------------------------------------
 
 --
+-- Stand-in structure for view `PuntuacionTotal`
+--
+CREATE TABLE `PuntuacionTotal` (
+`id` int(11)
+,`puntuacion` decimal(33,0)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `Ranking`
+--
+CREATE TABLE `Ranking` (
+`id` int(11)
+,`puntuacion` decimal(33,0)
+);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `ssi`
 --
 
@@ -271,6 +307,22 @@ INSERT INTO `Usuario` (`id`, `name`, `password`) VALUES
 (13, 'elmendas3', '098f6bcd4621d373cade4e832627b4f6'),
 (14, 'elmendas4', '098f6bcd4621d373cade4e832627b4f6');
 
+-- --------------------------------------------------------
+
+--
+-- Structure for view `PuntuacionTotal`
+--
+DROP TABLE IF EXISTS `PuntuacionTotal`;
+-- in use(#1046 - No database selected)
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `Ranking`
+--
+DROP TABLE IF EXISTS `Ranking`;
+-- in use(#1046 - No database selected)
+
 --
 -- Indexes for dumped tables
 --
@@ -323,7 +375,7 @@ ALTER TABLE `Usuario`
 -- AUTO_INCREMENT for table `Partida`
 --
 ALTER TABLE `Partida`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 --
 -- AUTO_INCREMENT for table `Pregunta`
 --
