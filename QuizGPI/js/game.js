@@ -8,8 +8,7 @@
  * 
  * 
  * 
- * El método comenzar_juego(), se invoca para iniciar el juego; Carga la pantalla del juego 
- * principal y realiza una petición al servidor para obtener las preguntas que el usuario debe
+ * El método comenzar_juego(), se invoca para iniciar el juego; Realiza una petición al servidor para obtener las preguntas que el usuario debe
  * responder.
  * La pantalla del juego principal deberá tener varios elementos HTML que se irán actualizando conforme
  * vaya avanzando el juego:
@@ -24,9 +23,8 @@
  * El método siguiente_pregunta() actualiza la pantalla del juego con la siguiente pregunta que 
  * el usuario debe responder.
  * 
- * La función fin_juego() actualiza la pantalla del juego con la pantalla de postpartido.
- * La pantalla de postpartido necesitará los siguientes elementos HTML:
- * - Uno con la id "puntuacion" cuyo texto será actualizado con la puntuación obtenida en el juego.
+ * La función fin_juego() envía al servidor la puntuación del jugador y le redirecciona a la página
+ * con la pantalla de postpartido.
  */
 
 
@@ -65,30 +63,23 @@ $(document).ready(function() {
 	}
 	
 	
-	/** Este método realiza una petición GET al servidor para cargar el contenido
-	 * de la pantalla principal del juego, y obtener las preguntas que el usuario
-	 * debe responder.
-	 * La petición GET es: /index.php?op=view&id=3
-	 * El contenido de la pantalla principal del juego se carga en el elemento HTML
-	 * con la id "pantalla_juego"
-	 * Una vez que el contenido de la pantalla principal del juego haya sido cargado,
-	 * se invoca el callback que se especifica como parámetro.
+	/** Este método realiza una petición GET al servidor para
+	 * btener las preguntas que el usuario debe responder.
+	 * La petición GET es: /index.php?op=view&id=7
+	 * Una vez que la petición haya sido respondida con exito (se han obtenido las
+	 * preguntas), se invoca el callback que se pasa como parámetro)
 	 */
 	comenzar_juego = function(callback) { 
 		$.getJSON('/index.php',
-			{op:'view', id:'3'},
-			function(response) { 
-				// Cargamos la pantalla del juego.
-				$("#pantalla_juego").html(response.pagina);
-								
-				preguntas = response.preguntas;
+			{op:'view', id:'7'},
+			function(response) { 								
+				preguntas = response;
 				
 				// Imprimimos la primera pregunta
 				siguiente_pregunta();
 				if(jQuery.type(callback) == "function") { 
 					callback();
 				}
-				
 				// Inicializamos la puntuación de usuario
 				puntuacion = 0
 			});
@@ -125,48 +116,23 @@ $(document).ready(function() {
 	
 	/**
 	 * Este método es invocado cuando el juego finaliza. 
-	 * Carga la pantalla de postpartido (Haciendo una petición GET al servidor) y envía la puntuación final al servidor(haciendo
-	 * una petición POST. 
-	 * La petición GET es: /index.php?op=view&id=4
+	 * Envía la puntuación final al servidor(haciendo una petición POST. 
 	 * La petición POST es /index.php?op=command&id=3&ac=actualizar_puntuacion. Se pasa como parámetro via POST la puntuación obtenida. 
-	 * Por último, se invoca un callback cuando se haya cargado finalmente la pantalla de postpartido.
+	 * El resultado de esta petición POST, es la ID de la partida que el usuario acaba de jugar.
+	 * Por último se redirecciona al jugador, a la página:
+	 * /index.php?op=view&id=4&match_id=<id_de_la_partida>
+	 * Antes de hacer la redirección, se invoca el callback que se pasa como parámetro.
 	 */
 	fin_juego = function(callback) { 
-		$.get('/index.php',
-			{op:'view', id:'4'},
-			function(pagina) { 
-				// Cargamos la pantalla del postpartido.
-				$("#pantalla_juego").html(pagina);
-				$("#puntuacion").text(puntuacion);
-			
+		$.post('/index.php?op=command&id=3&ac=actualizar_puntuacion', 
+			{puntuacion:puntuacion},
+			function(response) { 
 				if(jQuery.type(callback) == "function") { 
 					callback();
 				}
-			});
-		$.post('/index.php?op=command&id=3&ac=actualizar_puntuacion', 
-			{puntuacion:puntuacion},
-			function() { 
-				
+				match_id = response;
+				location.replace('/index.php?op=view&id=4&match_id=' + match_id);
 			})
 	}
 	
-	/**
-	 * Este método puede invocarse para ver el ranking de mejores puntuaciones.
-	 * Realiza la petición GET: /index.php?op=view&id=5 
-	 * 
-	 * Finalmente se invoca el callback que se pasa como parámtro cuando la pantalla
-	 * de ranking esté lista.
-	 */
-	ver_ranking = function(callback) { 
-		$.get('/index.php',
-			{op:'view', id:'5'},
-			function(pagina) { 
-				// Cargamos la pantalla del ranking
-				$("#pantalla_juego").html(pagina);
-	
-				if(jQuery.type(callback) == "function") { 
-					callback();
-				}
-			});
-	}
 });

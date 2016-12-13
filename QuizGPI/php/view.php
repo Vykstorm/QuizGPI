@@ -46,6 +46,7 @@ class View
             case 'gameScreen':
 				$path = 'html/game.html';
 				break;
+				
 			case 'postPartido':
 				$path = 'html/postpartido.html';
 				break;
@@ -82,13 +83,13 @@ class View
     public static function gameScreen()
     {
 		$text = View::getHtml('gameScreen');
-		return $text;
+		echo $text;
 	}
-
+	
 	/* Carga la pantalla de postpartido */
 	public static function postPartido() { 
 		$text = View::getHtml('postPartido');
-		echo $text;
+		return $text;
 	}
 		
     /* Carga la pagina de login */

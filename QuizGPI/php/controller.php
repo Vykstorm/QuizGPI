@@ -48,10 +48,28 @@ class Controller
                     break;
                     
                 case '3': // Carga juego, pantalla principal
-					Controller::gameScreen();
+					View::gameScreen();
 					break;
+				case '8': // Carga jugego, pantalla multijugador
+					// TODO
+					break;
+				case '7': // Carga las preguntas del juego.
+					Controller::preguntas();
+					break;
+					
 				case '4': // Carga juego, pantalla de postpartido
-					View::postPartido(); 
+					if (empty($_GET['match_id']) && empty($_POST['match_id'])) { 
+						exit('Error al cargar los resultados de la partida');
+					}
+					$match_id = $_GET['match_id'];
+					if (empty($_GET['match_id'])) { 
+						$match_id = $_POST['match_id'];
+					}
+					if (empty(intval($match_id))) { 
+						exit('Error al cargar los resultados de la partida');
+					}
+					$match_id = intval($match_id);
+					Controller::postPartido($match_id); 
 					break;
 				case '5': // Carga la pagina de ranking
 					Controller::ranking();
@@ -110,29 +128,23 @@ class Controller
 	}
 	
 	
-	/* Carga la página del juego (Pantalla del juego) */
+	/* Carga las preguntas del juego */
 	/*
 	 * El servidor responderá con un texto en formato JSON
-	 * con la página HTML de la pantalla principal del juego + 
-	 * preguntas que el usuario debe responder
+	 * con la información sobre las preguntas que el usuario debería
+	 * responder.
 	 *   
 	 */
-	public static function gameScreen()
+	public static function preguntas()
 	{
 		$tema = 'Informatica';
 		$num_preguntas = 5;
 		/* Obtenemos las preguntas */
 		$preguntas = Model::getPreguntas($num_preguntas, $tema) or exit('Fallo al obtener las preguntas: tema=' . $tema . ', num.preguntas=' . $num_preguntas);
-
-		/* Obtenemos la página HTML de la pantalla del juego */
-		$pagina = View::gameScreen();
 		
-		/* Devolvemos la respuesta del servidor: preguntas + página en formato JSON */
-		$respuesta = array('preguntas' => $preguntas, 'pagina' => $pagina);
-		
+		$text = json_encode($preguntas);
 		
 		header('Content-type: application/json');
-		$text = json_encode($respuesta);
 		echo $text;
 	}
 	
@@ -149,6 +161,25 @@ class Controller
 		/* Mostramos la pagina */
 		View::ranking($ranking);
 		
+	}
+	
+	/**
+	 * Carga la página del postpartido.
+	 * Toma como parámetro la ID del partido.
+	 */
+	private static function postPartido($match_id) 
+	{
+		// Obtenemos la página con la vista de postpartido
+		$pagina = View::postPartido();
+		
+		// Obtenemos la información de la partida.
+		$infoPartida = Model::getInfoPartida($match_id);
+		
+		// Reemplazamos las etiquetas del HTML
+		// TODO...
+		
+		// Imprimimos la página
+		echo $pagina;
 	}
 
 	/* Inicio de sesion, es privado porque solo el controlador lo va utilizar */
