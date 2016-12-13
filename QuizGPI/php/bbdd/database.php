@@ -13,7 +13,10 @@ class DataBase
 
 		if($mysqli->connect_errno)
 			echo "Fallo al conectar a MySQL: (".$mysqli->connect_errno.")".$mysqli->connect_error;
-
+			
+		// Establecer la codificación de caracteres para las queries
+		mysqli_set_charset($mysqli, 'utf8');
+	
 		return $mysqli;
 	}
 
