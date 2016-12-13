@@ -46,12 +46,19 @@ class Facade
 		if($row["n"] == 1) // Existe el tema en la bbdd
 		{
 			// Selecciona n filas aleatorias de la tabla preguntas del tema t
-			$query = "SELECT * 
-			FROM Pregunta 
-			WHERE RAND()<(SELECT ((3/COUNT(*))*10) FROM Pregunta) and tema = '".$t."' 
+			$query = 
+			"SELECT * 
+			FROM 
+				Pregunta 
+				INNER JOIN 
+					(SELECT id, nombre nombre_tema 
+					FROM Tema
+					WHERE nombre = '" . $t . "') Tema
+				ON Pregunta.tema = Tema.id
+			WHERE RAND()<(SELECT ((3/COUNT(*))*10) FROM Pregunta)
 			ORDER BY RAND() 
-			LIMIT '".$n."'";
-
+			LIMIT " . $n;
+			
 			return DataBase::execute($query);
 		}
 		else // No existe el tema en la bbdd
@@ -67,9 +74,19 @@ class Facade
      * El array debe estar ordenado en orden decreciente en función de sus puntuaciones.
      */
     public static function getRanking($n) { 
-
+		
 	}
 	
+	/**
+	 * Devuelve un array con información sobre los resultados de un partido.
+	 * Este array contiene los siguientes campos:
+	 * - j1: Nombre del jugador 1
+	 * - j2: Nombre del jugador 2 (NULL si la partida fue de 1 solo jugador)
+	 * - p1: Puntuación del jugador 1
+	 * - p2: Puntuación del jugador 2 (NULL si la partida fue de 1 solo jugador)
+	 * Este método toma como parámetro la ID de la partida.
+	 * Lanza un error o una excepción en el caso en el que la ID de la partida no sea válida.
+	 */
 	public static function getInfoPartida($match_id) { 
 	}
 }
