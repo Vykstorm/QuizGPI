@@ -16,36 +16,61 @@ class Controller
 		Controller::initSession();
 
         
-        /*if(Controller::checkSession() == false){
-            echo "session false";
-        }
-        else{
-            echo "session true"; 
-        }*/
-
-        /*if(Controller::checkSession() == false){
-            if($var["id"] == '2')
+        /*    NO EXISTE SESION    */
+        if(Controller::checkSession() == false){
+            if($var["op"] == "view")
             {
-                header("Location:index.php?op=view&id=2");
+                if($var["id"] == '2')
+                {
+                    View::register();
+                }
+                else
+                {
+                    View::login();
+                }
+            }
+            else if($var["op"] == "command")
+            {
+                switch ($var["id"]) 
+                {
+                    case '1': // Login
+                        $ret = Model::loginUser();
+                        if(empty($ret)) { header("Location:index.php?op=view&id=6"); }
+                        else{ View::login($ret); }
+                        break; 
+                        
+                    case '2': // Register
+                        $ret = Model::registerUser();
+                        if(empty($ret)) { header("Location:index.php?op=view&id=6"); }
+                        else{ View::register($ret); }
+                        break;
+                        
+                    default:
+                        View::login();
+                        break;
+                }
             }
             else
             {
-                header("Location:index.php?op=view&id=1");
+                View::login();
             }
             
             return;
-        }*/
+        }
 
+        
+        /*    EXISTE SESION    */
 		if($var["op"] == "view")
 		{
 			switch ($var["id"]) 
 			{
 				case '1':   // Carga login
                     View::login();
-					break;
+					break; 
+                    
                 case '2':   // Carga registro
                     View::register();
-                    break;
+                    break;  
                     
                 case '3': // Carga juego, pantalla principal
 					View::gameScreen();
@@ -56,7 +81,6 @@ class Controller
 				case '7': // Carga las preguntas del juego.
 					Controller::preguntas();
 					break;
-					
 				case '4': // Carga juego, pantalla de postpartido
 					if (empty($_GET['match_id']) && empty($_POST['match_id'])) { 
 						exit('Error al cargar los resultados de la partida');
@@ -71,13 +95,16 @@ class Controller
 					$match_id = intval($match_id);
 					Controller::postPartido($match_id); 
 					break;
+                    
 				case '5': // Carga la pagina de ranking
 					Controller::ranking();
 					break;
+                    
                 case '6':	// Carga el menu
                     $name = Session::getVar('userName');
 					View::menu($name);
 					break;
+                    
 				default:
 					echo "Error. Controller::system(). op=view.";
 					print_r($var);
@@ -89,10 +116,6 @@ class Controller
 		{
 			switch ($var["id"]) 
 			{
-				case 'value':
-					
-					break;
-                    
                 case '1': // Login
                     $ret = Model::loginUser();
                     if(empty($ret)) { header("Location:index.php?op=view&id=6"); }
@@ -103,16 +126,16 @@ class Controller
                     $ret = Model::registerUser();
                     if(empty($ret)) { header("Location:index.php?op=view&id=6"); }
                     else{ View::register($ret); }
-                    break;
+                    break;  
                     
 				case '3': //Gestionar manejo de usuarios & partidas
 					break;
-					
+                    
                 case '4':
                     Session::destroy();
                     header("Location:index.php?op=view&id=1");
                     break;
-                
+                    
 				default:
 					echo "Error. Controller::system(), op=command.";
 					print_r($var);
