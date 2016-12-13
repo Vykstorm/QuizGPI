@@ -124,7 +124,7 @@ class Model
     	else
     	{
     		return false;
-    	}    	
+    	}
     }
     
     /**
@@ -134,7 +134,21 @@ class Model
      * El array debe estar ordenado en orden decreciente en función de sus puntuaciones.
      */
     public static function getRanking($n) { 
-		return array();
+		return Facade::getRanking($n);
+	}
+	
+	/**
+	 * Devuelve un array con información sobre los resultados de un partido.
+	 * Este array contiene los siguientes campos:
+	 * - j1: Nombre del jugador 1
+	 * - j2: Nombre del jugador 2 (NULL si la partida fue de 1 solo jugador)
+	 * - p1: Puntuación del jugador 1
+	 * - p2: Puntuación del jugador 2 (NULL si la partida fue de 1 solo jugador)
+	 * Este método toma como parámetro la ID de la partida.
+	 * Lanza un error o una excepción en el caso en el que la ID de la partida no sea válida.
+	 */
+	public static function getInfoPartida($match_id) { 
+		return Facade::getInfoPartida($match_id);
 	}
 }
 ?>

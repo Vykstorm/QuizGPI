@@ -59,5 +59,18 @@ class Facade
 			return false;
 		}
     }
+    
+    /**
+     * Devuelve un array con las n mejores puntuaciones del juego.
+     * El valor de retorno debe ser un array. Cada elemento del array es un
+     * array asociativo con la siguiente estructura: array('j' => nombre_jugador, 'p' => puntuacion);
+     * El array debe estar ordenado en orden decreciente en función de sus puntuaciones.
+     */
+    public static function getRanking($n) { 
+
+	}
+	
+	public static function getInfoPartida($match_id) { 
+	}
 }
 ?>
