@@ -101,7 +101,7 @@ class Model
     	{    		
     		if($result = Facade::getPreguntas($n, $t))
     		{
-    			$data   = array();
+    			$data  = array();
 
 	    		while ($row = mysqli_fetch_array($result))
 	    		{
@@ -110,7 +110,7 @@ class Model
 	    				"r2" => $row["respuesta2"], "r3" => $row["respuesta3"],
 	    				"r4" => $row["respuesta4"], "c" => $row["correcta"]);
 
-	    			$data = array_push($data, $a);
+	    			array_push($data, $a);
 	    		}
 
 	    		return $data;
