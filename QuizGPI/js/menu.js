@@ -16,5 +16,8 @@ $("#document").ready(function() {
 	$("#jugar2").click(function() {
 			location.replace('/index.php?op=view&id=8');
 		})
+	$("#ranking").click(function() { 
+			location.replace('/index.php?op=view&id=5');
+		})
 	})
 
