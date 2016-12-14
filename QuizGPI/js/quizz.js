@@ -13,7 +13,7 @@ $(document).ready(function() {
 		
 		// Añadimos manejadores a los botones de las respuestas.
 		responder = function() { 
-			if(responder_pregunta($(this).attr("id"))) { 
+			if(responder_pregunta($(this).attr("id").replace("c", "r"))) { 
 				$("#resultado").text("!Respuesta correcta!"); 
 			}
 			else { 
