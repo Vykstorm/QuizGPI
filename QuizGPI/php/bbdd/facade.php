@@ -126,5 +126,54 @@ class Facade
 		}
 		return false;
 	}
+
+	// Inserta los datos de la partida, tanto de un solo jugador, como de dos
+	public static function insertPartida($data)
+	{
+		// Comprueba si la partida es de un jugador o dos
+		if(isset($data["j2"]))
+		{
+			return Facade::insert2P($data);
+		}
+		else
+		{
+			return Facade::insert1P($data);
+		}
+	}
+
+	// Inserta los datos de una partida de dos jugadores
+	private static function insert2P($data)
+	{
+		$p1 = strval($data["p1"]);
+		$p2 = strval($data["p2"]);
+		$query = 'INSERT INTO Partida (usuario1,usuario2,puntuacion1,puntuacion2) 
+		VALUES ('.$data["j1"].','.$data["j2"].','.$p1.','.$p2.')';
+		if(DataBase::execute($query))
+		{
+			return DataBase::getLastId();
+		}
+		else
+		{
+			return 0;
+		}		
+	}
+
+	
+	//Inserta los datos de una partida de un jugador
+	private static function insert1P($data)
+	{
+		$p1 = strval($data["p1"]);
+	
+		$query = 'INSERT INTO Partida (usuario1, puntuacion1)
+		VALUES ('.$data["j1"].', '.$p1.')';
+		if(DataBase::execute($query))
+		{
+			return DataBase::getLastId();
+		}
+		else
+		{
+			return 0;
+		}
+	} 
 }
 ?>
