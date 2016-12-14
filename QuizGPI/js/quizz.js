@@ -17,7 +17,7 @@ $(document).ready(function() {
 				$("#resultado").text("!Respuesta correcta!"); 
 			}
 			else { 
-				$("#resultado").text("Respuesta incorrecta motherfucker");
+				$("#resultado").text("Respuesta incorrecta");
 			}
 			$("#resultado").fadeIn(400).delay(1000).fadeOut(400);
 			
