@@ -23,10 +23,10 @@ $(document).ready(function() {
 			
 			setTimeout(function() { 
 				if(!siguiente_pregunta()) { 
-					$("#r1").unbind();
-					$("#r2").unbind();
-					$("#r3").unbind();
-					$("#r4").unbind();
+					$("#c1").unbind();
+					$("#c2").unbind();
+					$("#c3").unbind();
+					$("#c4").unbind();
 					$("#pantalla_juego").fadeOut(2000);
 					fin_juego(function() { 
 						$("#pantalla_juego").hide();
@@ -41,10 +41,10 @@ $(document).ready(function() {
 				}
 			}, 2000);
 		}			
-		$("#r1").click(responder);
-		$("#r2").click(responder);
-		$("#r3").click(responder);
-		$("#r4").click(responder);
+		$("#c1").click(responder);
+		$("#c2").click(responder);
+		$("#c3").click(responder);
+		$("#c4").click(responder);
 			
 		$("#pantalla_juego").fadeIn(1000)
 		})
