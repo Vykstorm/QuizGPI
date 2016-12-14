@@ -34,5 +34,16 @@ class DataBase
 		DataBase::close($mysqli);
 		return $result;
 	}
+	
+	/** Devuelve la última ID del registro insertado por una query de tipo
+		INSERT INTO ...
+	*/
+	public static function getLastID() 
+	{
+		$mysqli = DataBase::connect();
+		$id = mysqli_insert_id($mysqli);
+		Database::close($mysqli);
+		return $id;
+	}
 }
 ?>

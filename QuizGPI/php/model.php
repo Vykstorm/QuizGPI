@@ -170,5 +170,25 @@ class Model
 		}
 		return false;
 	}
+	
+	
+	/** 
+	 * Almacena los resultados de una partida del juego.
+	 * Se debe pasar como parámetro un array con los siguientes campos:
+	 * - j1: ID del jugador 1
+	 * - p1: Puntuacion del jugador 1
+	 * - j2: ID del jugador 2
+	 * - p2: Puntuación del jugador 2
+	 * Los dos último parámetros se omiten la partida fue de un solo jugador.
+	 * Devuelve la id de la partida almacenada o false en caso de fallo
+	 */
+	public static function guardarResultadosPartida($datos) { 
+		$result = Facade::insertPartida($datos);
+		if($result)  { 
+			$id = $result;
+			return $id;
+		}
+		return false;
+	}
 }
 ?>

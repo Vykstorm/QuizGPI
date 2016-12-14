@@ -123,6 +123,22 @@ class Controller
                     break;  
                     
 				case '3': //Gestionar manejo de usuarios & partidas
+					switch ($var['ac']) {
+						case 'save_match': // Almacenar los resultados de una partida (1 Jugador)
+							/* Verificamos los parámetros */
+							if empty($_POST['puntuacion']) {
+								exit('Parametros no validos');
+							}
+							$puntuacion = $_POST['puntuacion'];
+							if ($puntuacion != '0') and empty(intval($puntuacion)) { 
+								exit('Parametros no validos');
+							}
+							$puntuacion = intval($puntuacion);
+							
+							/* Almacenamos los resultados de la partida */
+							Model::guardarResultadosPartida(array('j1' => Session::getVar('userID'), 'p1' => $puntuacion));
+							break;
+					}
 					break;
                     
                 case '4':
