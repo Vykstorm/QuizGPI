@@ -64,14 +64,7 @@ class Controller
 		{
 			switch ($var["id"]) 
 			{
-				case '1':   // Carga login
-                    View::login();
-					break; 
-                    
-                case '2':   // Carga registro
-                    View::register();
-                    break;  
-                    
+  
                 case '3': // Carga juego, pantalla principal
 					View::gameScreen();
 					break;
@@ -106,9 +99,10 @@ class Controller
 					break;
                     
 				default:
-					echo "Error. Controller::system(). op=view.";
-					print_r($var);
+					$name = Session::getVar('userName');
+					View::menu($name);
 					break;
+                    
 			}//END switch ($var["id"])
 
 		}// END if($var["op"] == "view")
