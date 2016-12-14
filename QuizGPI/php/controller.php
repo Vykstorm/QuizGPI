@@ -136,7 +136,8 @@ class Controller
 							$puntuacion = intval($puntuacion);
 							
 							/* Almacenamos los resultados de la partida */
-							Model::guardarResultadosPartida(array('j1' => Session::getVar('userID'), 'p1' => $puntuacion));
+							$match_id = Model::guardarResultadosPartida(array('j1' => Session::getVar('userID'), 'p1' => $puntuacion));
+							echo $match_id;
 							break;
 					}
 					break;
