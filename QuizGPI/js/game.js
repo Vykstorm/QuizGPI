@@ -98,6 +98,7 @@ $(document).ready(function() {
 	responder_pregunta = function(respuesta) { 
 		pregunta = preguntas[preguntas.length-1];
 		preguntas.pop();
+        pregunta.c = "r" + pregunta.c;
 		if(pregunta.c == respuesta) { 
 			// Añadir puntuación al usuario.
 			tiempo_restante = 5; // Tiempo transcurrido en segundos (siempre > 0)
