@@ -6,6 +6,7 @@
 
         <title>Ranking</title>
         
+		<link href="../css/ranking.css" rel="stylesheet">
         <link href="../css/metro.min.css" rel="stylesheet">
         <link href="../css/metro-icons.min.css" rel="stylesheet">
         <link href="../css/metro-responsive.min.css" rel="stylesheet">
@@ -13,12 +14,33 @@
         <script src="../js/jquery-3.1.1.min.js"></script>
         <script src="../js/metro.min.js"></script>
     </head>
-    <body>
-        <table id="ranking">
-            <tr><th class="posicion"></th><th class="jugador">Jugador</th><th class="puntuacion">Puntuación</th></tr> 
-            ~~RANK~~
-            <tr><td class="posicion">#posicion#</td><td class="jugador">#jugador#</td><td class="puntuacion">#puntuacion#</td></tr>
-            ~~RANK~~
-        </table>
+    <body class="bg-lime">
+		<div class="ranking-form padding20 block-shadow">
+		
+			<!-- TITULO -->
+			<h1 class="align-center">RANKING</h1>
+			<h2 class="align-center">Top 10 Siempre</h2>
+			
+			<!-- RANKING -->
+			<table class="table border" id="ranking">
+			
+                <!-- Cabecera -->
+				<tr><th></th><th>Jugador</th><th>Puntuación</th></tr> 
+                
+                <!-- Puntuacion de los 10 primeros -->
+				~~RANK~~
+				<tr><td>#posicion#</td><td>#jugador#</td><td>#puntuacion#</td></tr>
+				~~RANK~~
+                
+                <!-- Puntuacion del usuario. SOLO se muestra si no ha salido entre los 10 primeros -->
+                ~~PRANK~~
+				<tr class="jugador"><td>#posicion#</td><td>#jugador#</td><td>#puntuacion#</td></tr>
+                ~~PRANK~~
+			</table>
+			
+			<!-- BOTONES -->
+			<a class="button success text-shadow" href="../index.php?op=view&id=6" id="menu">Volver al menu</a>
+			<a class="button info text-shadow" href="" id="download">Descargar Ranking</a>
+		</div>
     </body>
 </html>
