@@ -1,0 +1,49 @@
+.ranking-form {
+    width: 30rem;
+    height: 28rem;
+    position: fixed;
+    top: 50%;
+    margin-top: -14rem;
+    left: 50%;
+    margin-left: -15rem;
+    background-color: #ffffff;
+}
+
+.jugador{
+  border: 1px #999999 solid !important;
+}
+
+table{
+	border-collapse: collapse;
+}
+
+td{
+	text-align: center !important; 
+    vertical-align: middle !important; 
+}
+
+tr{
+	line-height: 5px !important;
+}
+
+tr:hover{
+	background-color: rgba(125, 218, 147, 0.6) !important;
+}
+
+h1{
+    font-size: 18px !important;
+	font-weight: bold !important; 
+}
+
+h2{
+    font-size: 12px !important;
+	text-decoration: underline;
+}
+
+a{
+    display: inline-block;
+	width: 49%;
+    text-transform: uppercase;
+}
+
+
