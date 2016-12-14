@@ -125,7 +125,7 @@ $(document).ready(function() {
 	 * Antes de hacer la redirección, se invoca el callback que se pasa como parámetro.
 	 */
 	fin_juego = function(callback) { 
-		$.post('/index.php?op=command&id=3&ac=actualizar_puntuacion', 
+		$.post('/index.php?op=command&id=3&ac=save_match', 
 			{puntuacion:puntuacion},
 			function(response) { 
 				if(jQuery.type(callback) == "function") { 
