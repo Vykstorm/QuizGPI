@@ -132,23 +132,43 @@ class Model
      * El valor de retorno debe ser un array. Cada elemento del array es un
      * array asociativo con la siguiente estructura: array('j' => nombre_jugador, 'p' => puntuacion);
      * El array debe estar ordenado en orden decreciente en función de sus puntuaciones.
+     * Devuelve false en caso de fallo
      */
     public static function getRanking($n) { 
-		return Facade::getRanking($n);
+		$result = Facade::getRanking($n);
+		if($result) { 
+			$ranking = array(); 
+			while($row = mysqli_fetch_array($result))
+				array_push($ranking, array('j' => $row['name'], 'p' => intval($row['puntuacion'])));
+			return $ranking;
+		}
+		return false;
 	}
 	
 	/**
 	 * Devuelve un array con información sobre los resultados de un partido.
-	 * Este array contiene los siguientes campos:
+	 * Este array contiene los siguientes campos (si la partida fue entre DOS JUGADORES):
 	 * - j1: Nombre del jugador 1
 	 * - j2: Nombre del jugador 2 (NULL si la partida fue de 1 solo jugador)
 	 * - p1: Puntuación del jugador 1
 	 * - p2: Puntuación del jugador 2 (NULL si la partida fue de 1 solo jugador)
+	 * Si la partida fue de un único jugador, se omiten los campos j2, p2
 	 * Este método toma como parámetro la ID de la partida.
 	 * Lanza un error o una excepción en el caso en el que la ID de la partida no sea válida.
+	 * Devuelve false en caso de fallo
 	 */
 	public static function getInfoPartida($match_id) { 
-		return Facade::getInfoPartida($match_id);
+		$result = Facade::getInfoPartida($match_id);
+		if($result) { 
+			if($row = mysqli_fetch_array($result)) { 
+				if (!isset($row['jugador2'])) { // 1 JUGADOR
+					return array('j1' => $row['jugador1'], 'p1' => $row['puntuacion1']);
+				}
+				// 2 JUGADORES
+				return array('j1' => $row['jugador1'], 'j2' => $row['jugador2'], 'p1' => intval($row['puntuacion1']), 'p2' => intval($row['puntuacion2']));
+			}
+		}
+		return false;
 	}
 }
 ?>

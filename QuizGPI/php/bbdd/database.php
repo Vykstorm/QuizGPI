@@ -9,7 +9,7 @@ class DataBase
 	// Conexion con la base de datos
 	protected static function connect()
 	{
-		$mysqli = new mysqli("localhost","gpiftp","pass3232","gpi");
+		$mysqli = new mysqli("localhost","root","nexus11235","sample");
 
 		if($mysqli->connect_errno)
 			echo "Fallo al conectar a MySQL: (".$mysqli->connect_errno.")".$mysqli->connect_error;

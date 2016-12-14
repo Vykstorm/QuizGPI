@@ -83,14 +83,14 @@ class Controller
 					break;
 				case '4': // Carga juego, pantalla de postpartido
 					if (empty($_GET['match_id']) && empty($_POST['match_id'])) { 
-						exit('Error al cargar los resultados de la partida');
+						exit('ID de partida no valida');
 					}
 					$match_id = $_GET['match_id'];
 					if (empty($_GET['match_id'])) { 
 						$match_id = $_POST['match_id'];
 					}
 					if (empty(intval($match_id))) { 
-						exit('Error al cargar los resultados de la partida');
+						exit('ID de partida no valida');
 					}
 					$match_id = intval($match_id);
 					Controller::postPartido($match_id); 
@@ -196,10 +196,11 @@ class Controller
 		$pagina = View::postPartido();
 		
 		// Obtenemos la información de la partida.
-		$infoPartida = Model::getInfoPartida($match_id);
-		
+		$infoPartida = Model::getInfoPartida($match_id) or exit('No es posible obtener la información de partida');
+	
 		// Reemplazamos las etiquetas del HTML
 		// TODO...
+		$pagina = str_replace('##puntuacion##', strval($infoPartida['p1']), $pagina);
 		
 		// Imprimimos la página
 		echo $pagina;

@@ -68,26 +68,63 @@ class Facade
     }
     
     /**
-     * Devuelve un array con las n mejores puntuaciones del juego.
-     * El valor de retorno debe ser un array. Cada elemento del array es un
-     * array asociativo con la siguiente estructura: array('j' => nombre_jugador, 'p' => puntuacion);
-     * El array debe estar ordenado en orden decreciente en función de sus puntuaciones.
+     * Devuelve el ranking de puntuaciones más altas de los usuarios
+     * (solo las primeras n puntuaciones).
+     * El resultado de la consulta es un conjunto de filas donde cada una de ellas
+     * esta compuesta por dos valores: name, puntuacion 
+     * Son el nombre y la puntuación de cada jugador en el ranking.
+     * Están ordenadas de mayor a menor puntuación.
      */
     public static function getRanking($n) { 
-		
+		$query = 
+		'SELECT name, puntuacion
+		FROM PuntuacionTotal INNER JOIN Usuario ON (PuntuacionTotal.id = Usuario.id)
+		ORDER BY puntuacion DESC
+		LIMIT ' . $n;
+		return Database::execute($query);
+	}
+	
+	
+	private static function getInfoPartidaMultijugador($match_id) { 
+		$query = 
+		'SELECT Jugador1.name jugador1, Jugador2.name jugador2, Partida.puntuacion1, Partida.puntuacion2
+		FROM 
+			(SELECT * FROM Partida WHERE id = ' . $match_id . ') Partida
+			INNER JOIN (SELECT id, name FROM Usuario) AS Jugador1 ON Partida.usuario1 = Jugador1.id 
+			INNER JOIN (SELECT id, name FROM Usuario) AS Jugador2 ON Partida.usuario2 = Jugador2.id';
+		return Database::execute($query);
+	}
+	
+	private static function getInfoPartidaIndividual($match_id) { 
+		$query = 
+		'SELECT name jugador1, puntuacion puntuacion1 
+		FROM 
+			(SELECT id, usuario1 usuario, puntuacion1 puntuacion FROM Partida WHERE id=' . $match_id .') Puntuacion 
+			INNER JOIN 
+			(SELECT id, name FROM Usuario) Usuario 
+			ON Puntuacion.usuario = Usuario.id';
+		return Database::execute($query);
 	}
 	
 	/**
-	 * Devuelve un array con información sobre los resultados de un partido.
-	 * Este array contiene los siguientes campos:
-	 * - j1: Nombre del jugador 1
-	 * - j2: Nombre del jugador 2 (NULL si la partida fue de 1 solo jugador)
-	 * - p1: Puntuación del jugador 1
-	 * - p2: Puntuación del jugador 2 (NULL si la partida fue de 1 solo jugador)
-	 * Este método toma como parámetro la ID de la partida.
-	 * Lanza un error o una excepción en el caso en el que la ID de la partida no sea válida.
+	 * Devuelve como resultado el resultado de una query, que estará compuesta
+	 * por una única fila con los siguientes valores (Si la partida fue MULTIJUGADOR):
+	 * - jugador1, jugador2 son los nombres de los jugadores que jugaron en la partida
+	 * - puntuacion1, puntuacion2 son sus puntuaciones correspondientes
+	 * En el caso en el que la partida fuera de un único jugador, se omiten los campos
+	 * jugador2 y puntuación2
 	 */
 	public static function getInfoPartida($match_id) { 
+		$query = 'SELECT id FROM Partida WHERE (id = ' . $match_id . ') and (usuario2 is NULL)';
+		$result = Database::execute($query);
+		if($result) { 
+			if(mysqli_fetch_array($result)) { // fue partida de 1 jugador  
+				return Facade::getInfoPartidaIndividual($match_id);
+			}
+			// fue partida de dos jugadores
+			return Facade::getInfoPartidaMultijugador($match_id);
+		}
+		return false;
 	}
 }
 ?>
