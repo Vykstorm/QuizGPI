@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 	<head>
+        <link href="../css/game.css" rel="stylesheet">
         <link href="../css/metro.min.css" rel="stylesheet">
         <link href="../css/metro-icons.min.css" rel="stylesheet">
         <link href="../css/metro-responsive.min.css" rel="stylesheet">
@@ -10,16 +11,38 @@
         <script src="../js/game.js"></script>
 		<script src="../js/quizz.js"></script>
 	</head>
-	<body>
-		<div id="pantalla_juego">
-			<h1>Quizz</h1>
+	<body class="bg-grayLight">
+		<div class="game-form padding20 block-shadow" id="pantalla_juego">
+            
+            <!-- PREGUNTA -->
 			<h2>Pregunta: <span id="pregunta"></span></h2>
-			<ol>
-				<li><button id="r1"></button></li>
-				<li><button id="r2"></button></li>
-				<li><button id="r3"></button></li>
-				<li><button id="r4"></button></li>
-			</ol>
+            
+            <!-- LISTA DE RESPUESTAS -->
+            <div class="respuestas">
+                <div class="listview leftView">
+                    <div class="list2 list">
+                        <span class="mif-question mif-3x fg-green"></span>
+                        <span class="list-title" id="r1"></span>
+                    </div>
+                    <div class="list2 list">
+                        <span class="mif-question mif-3x fg-red"></span>
+                        <span class="list-title" id="r2"></span>
+                    </div>
+                            
+                </div>
+                <div class="listview rightView">
+                    <div class="list2 list">
+                        <span class="mif-question mif-3x fg-blue"></span>
+                        <span class="list-title" id="r3"></span>
+                    </div>
+                    <div class="list2 list">
+                        <span class="mif-question mif-3x fg-yellow"></span>
+                        <span class="list-title" id="r4"></span>
+                    </div>	
+                </div>
+            </div>
+            
+            <!-- RESULTADO -->
 			<h2 id="resultado"></h2>
 		</div>
 	</body>
