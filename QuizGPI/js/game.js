@@ -149,24 +149,17 @@ $(document).ready(function() {
 	
 	/**
 	 * Este método es invocado cuando el juego finaliza. 
-	 * Envía la puntuación final al servidor(haciendo una petición POST. 
-	 * La petición POST es /index.php?op=command&id=3&ac=actualizar_puntuacion. Se pasa como parámetro via POST la puntuación obtenida. 
-	 * El resultado de esta petición POST, es la ID de la partida que el usuario acaba de jugar.
-	 * Por último se redirecciona al jugador, a la página:
-	 * /index.php?op=view&id=4&match_id=<id_de_la_partida>
+	 * Se redirecciona al jugador, a la página con el postpartido.
+	 * La petición es:
+	 * /index.php?op=view&id=4
 	 * Antes de hacer la redirección, se invoca el callback que se pasa como parámetro.
 	 */
 	 
 	fin_juego = function(callback) { 
-		$.post('/index.php?op=command&id=3&ac=save_match', 
-			{puntuacion:puntuacion},
-			function(response) { 
-				if(jQuery.type(callback) == "function") { 
-					callback();
-				}
-				match_id = response;
-				location.replace('/index.php?op=view&id=4&match_id=' + match_id);
-			})
-	}
+		if(jQuery.type(callback) == "function") { 
+			callback();
+			}	
+		location.replace('/index.php?op=view&id=4');
+		}
 	
 });
