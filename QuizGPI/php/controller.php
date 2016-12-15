@@ -65,33 +65,72 @@ class Controller
 			switch ($var["id"]) 
 			{
   
-                case '3': // Carga juego, pantalla principal
+                case '3': // Carga juego, pantalla principal (1 jugador)
+					// Creamos una nueva partida
+					$match_id = Model::nuevaPartida(Session::getVar('userID')) or exit('Fallo al crear la partida');
+					
+					// Generamos las preguntas que el jugador debe responder
+					$tema = 'Informatica'; 
+					$num_preguntas = 4;
+					$preguntas = Model::getPreguntas($num_preguntas, $tema) or exit('Fallo al generar las preguntas');
+					
+					// Almacenamos la ID de la partida como variable de sesión.
+					Session::setVar('matchID', $match_id);
+					// Guardamos información de la partida
+					Session::setVar('matchPreguntas', $preguntas); // Preguntas que el usuario deberá responder
+					// Mostramos la pantalla del juego.
 					View::gameScreen();
 					break;
-				case '8': // Carga jugego, pantalla multijugador
+
+				case '8': // Carga juego, pantalla (2 jugadores)
 					// TODO
 					break;
-				case '7': // Carga las preguntas del juego.
-					Controller::preguntas();
+					
+				case '7': // Carga la SIGUIENTE pregunta del juego.
+					if (!Session::getVar('matchID')) { 
+						exit('Todavia no ha comenzado la partida!');
+					}
+					if (empty(Session::getVar('matchPreguntas'))) { 
+						header('Content-type: application/json');
+						echo json_encode(0); // No quedan más preguntas. 
+						break;
+					}
+				
+					$siguiente_pregunta = current(Session::getVar('matchPreguntas'));
+					
+					// Guardamos un timestamp para luego comprobar el timeout.
+					Session::setVar('matchPreguntaTimestamp', $_SERVER['REQUEST_TIME']);
+					
+					
+					// Codificamos la respuesta en formato JSON
+					$text = json_encode($siguiente_pregunta);
+					
+					// Devolvemos la respuesta
+					header('Content-type: application/json');
+					echo $text; 
 					break;
+					
 				case '4': // Carga juego, pantalla de postpartido
-					if (empty($_GET['match_id']) && empty($_POST['match_id'])) { 
-						exit('ID de partida no valida');
+					if(!Session::getVar('matchID')) { 
+						exit('Todavia no ha comenzado la partida!');
 					}
-					$match_id = $_GET['match_id'];
-					if (empty($_GET['match_id'])) { 
-						$match_id = $_POST['match_id'];
+					if(!empty(Session::getVar('matchPreguntas'))) { 
+						exit('Aun quedan preguntas por responder!');
 					}
-					if (empty(intval($match_id))) { 
-						exit('ID de partida no valida');
-					}
-					$match_id = intval($match_id);
+					
+					
+					// Obtenemos la ID de la partida de la sesión
+					$match_id = Session::getVar('matchID');
+					
 					Controller::postPartido($match_id); 
 					break;
+					
+				
                     
 				case '5': // Carga la pagina de ranking
 					Controller::ranking();
 					break;
+             
                     
                 case '6':	// Carga el menu
                     $name = Session::getVar('userName');
@@ -123,21 +162,72 @@ class Controller
                     break;  
                     
 				case '3': //Gestionar manejo de usuarios & partidas
+					if (!Session::getVar('matchID')) // Comprobar que el usuario está en una partida.
+						break; 
 					switch ($var['ac']) {
-						case 'save_match': // Almacenar los resultados de una partida (1 Jugador)
-							/* Verificamos los parámetros */
-							if(empty($_POST['puntuacion'])) {
-								exit('Parametros no validos');
-							}
-							$puntuacion = $_POST['puntuacion'];
-							if(($puntuacion != '0') && empty(intval($puntuacion))) { 
-								exit('Parametros no validos');
-							}
-							$puntuacion = intval($puntuacion);
+						case 'answer':	
+							/* El usuario responde a la pregunta actual. Nos enviará por POST la respuesta R1, R2, ... */
 							
-							/* Almacenamos los resultados de la partida */
-							$match_id = Model::guardarResultadosPartida(array('j1' => Session::getVar('userID'), 'p1' => $puntuacion));
-							echo $match_id;
+							/* Válidamos los parámetros */
+							if(!isset($_POST['answer']) or !in_array($_POST['answer'], array('r1', 'r2', 'r3', 'r4'))) { 
+								exit('La respuesta indicada no es valida');
+							}
+							if(empty(Session::getVar('matchPreguntas'))) { 
+								exit('No hay pregunta que responder!');
+							}
+							
+							$respuesta = $_POST['answer'];
+							$respuesta = intval(substr($respuesta, 1, 1));
+							$pregunta = current(Session::getVar('matchPreguntas'));
+							$respuesta_correcta = intval($pregunta['c']);
+							
+							/* Eliminamos la pregunta actual */
+							$preguntas = Session::getVar('matchPreguntas');
+							array_shift($preguntas);
+							Session::setVar('matchPreguntas', $preguntas);
+							
+							/* Comprobamos que el timeout de la pregunta no ha expirado */
+							$timeout = 20;
+							if(($_SERVER['REQUEST_TIME'] - Session::getVar('matchPreguntaTimestamp')) >= $timeout) { 
+								// Timeout expirado
+								header('Content-type: application/json');
+								echo json_encode(1); // Enviar codigo 1
+								break;
+							}
+							/* Si no ha expirado... */
+							
+							/* Si la respuesta es correcta actualizamos la puntuación del jugador, en base
+							 * al tiempo transcurrido desde que se hizo la pregunta */
+							// TODO
+							if ($respuesta_correcta == $respuesta) { 
+								$puntuacion = $timeout - ($_SERVER['REQUEST_TIME'] - Session::getVar('matchPreguntaTimestamp'));
+								$user_id = Session::getVar('userID');
+								$match_id = Session::getVar('matchID');
+								Model::actualizarPuntuacion($match_id, $user_id, $puntuacion) or exit('Fallo al actualizar la puntuacion');
+							}
+							
+							/* Enviar al usuario el código de retorno 0/2 en función de si la respuesta es 
+							 * correcta o no */
+							header('Content-type: application/json');
+							echo json_encode(($respuesta_correcta == $respuesta) ? 2 : 0);
+							
+							break;
+						
+						case 'timeout': // El usuario ha alcanzado el timeout de la pregunta...
+							if(empty(Session::getVar('matchPreguntas'))) { 
+								exit('No hay pregunta que responder!');
+							}
+													
+							/* Eliminamos la pregunta actual */
+							$preguntas = Session::getVar('matchPreguntas');
+							array_shift($preguntas);
+							Session::setVar('matchPreguntas', $preguntas);
+							
+							/* Enviamos al usuario el código de retorno 1 que indica que el usuario ha alcanzado
+							 * el timeout 
+							 */
+							header('Content-type: application/json');
+							echo json_encode(1);
 							break;
 					}
 					break;

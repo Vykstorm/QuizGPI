@@ -25,13 +25,15 @@
  * 
  * La función fin_juego() envía al servidor la puntuación del jugador y le redirecciona a la página
  * con la pantalla de postpartido.
+ * 
+ * El método answer_timedout() es invocada cuando el usuario alcanza el tiempo límite para responder a una pregunta.
  */
 
 
 
 $(document).ready(function() { 
-	var preguntas;
-
+	/**** Variables ****/
+	answer_timeout = 20; // Indica el número de segundos que tiene el usuario para responder una pregunta.
 
 	/** Esta función carga la siguiente pregunta que el 
 	 * usuario debe responder. 
@@ -43,97 +45,121 @@ $(document).ready(function() {
 	 * Debe ser invocado después de haber llamado a comenzar_juego()
 	 * Devuelve true si hay más preguntas, o false si no las hay
 	 * (en cuyo caso, el juego finalizaría -> invocar fin_juego()
+	 * 
+	 * La siguiente pregunta se carga haciendo la siguiente petición:
+	 * GET: /index.php?op=view&id=7
+	 * 
+	 * Después de realizar dicha petición, 
+	 * se invoca el callback que se pasa como argumento (se le pasará como parámetro
+	 * un valor booleano indicando si hay más preguntas disponibles  o no
 	 */
-	siguiente_pregunta = function() {
-		if (preguntas.length == 0) { 
-			// Que ocurre si no hay más preguntas ?
-			return false
-		}
-		else { 
-			pregunta = preguntas[preguntas.length-1];
-			
-			$("#pregunta").text(pregunta.p);
-			$("#r1").text(pregunta.r1);
-			$("#r2").text(pregunta.r2);
-			$("#r3").text(pregunta.r3);
-			$("#r4").text(pregunta.r4);
-			
-			return true
-		}
+	siguiente_pregunta = function(callback) {
+		$.getJSON('/index.php',
+		{op:'view', id:'7'},
+		function(response) {
+			pregunta = response;
+			if (pregunta === 0) { 
+				// Que ocurre si no hay más preguntas ?	
+				if(jQuery.type(callback) == "function") { 
+					callback(false);
+				}	
+			}
+			else { // Hay otra pregunta...	
+				$("#pregunta").text(pregunta.p);
+				$("#r1").text(pregunta.r1);
+				$("#r2").text(pregunta.r2);
+				$("#r3").text(pregunta.r3);
+				$("#r4").text(pregunta.r4);			
+	
+				/* Guardamos un timestamp para comprobar posteriormente el
+				 * tiempo que dispone el usuario para responder */
+				timestamp = new Date().getTime();
+				
+				timeout = setTimeout(function() { 
+						answer_timedout();
+					}, answer_timeout*1000);
+				
+	
+				if(jQuery.type(callback) == "function") { 
+					callback(true);
+				}				
+			}
+		});
 	}
 	
-	
-	/** Este método realiza una petición GET al servidor para
-	 * btener las preguntas que el usuario debe responder.
-	 * La petición GET es: /index.php?op=view&id=7
-	 * Una vez que la petición haya sido respondida con exito (se han obtenido las
-	 * preguntas), se invoca el callback que se pasa como parámetro)
+	/** Este método es invocado cuando el juego comienza
 	 */
-	comenzar_juego = function(callback) { 
-		$.getJSON('/index.php',
-			{op:'view', id:'7'},
-			function(response) { 								
-				preguntas = response;
-				
-				// Imprimimos la primera pregunta
-				siguiente_pregunta();
-				if(jQuery.type(callback) == "function") { 
-					callback();
-				}
-				// Inicializamos la puntuación de usuario
-				puntuacion = 0
-			});
+	comenzar_juego = function(callback) { 			
+		// Imprimimos la primera pregunta
+		siguiente_pregunta(callback);
 	}
 	
 	/**
 	 * Este método es invocado cuando el usuario responde a la pregunta actual.
 	 * Toma como parámetro la respuesta escogida por el mismo, que debe ser
 	 * "r1", "r2", "r3" o "r4".
-	 * Se comprueba si la respuesta indicada es correcta o no es correcta.
-	 * Se actualiza la puntuación del usuario 
-	 * en base a cuanto tiempo a transcurrido desde que se le mostró inicialmente la pregunta.
-	 * Devuelve un valor booleano indicando si la respuesta es correcta o no.
-	 * Nota: Esta función debe invocarse después de haber llamado a siguiente_pregunta().
+	 * Se comprueba si la respuesta indicada es correcta o no es correcta;
+	 * Se envía una petición POST al servidor indicando la respuesta:
+	 * POST: index.php?op=command&id=3&ac=answer  y la variable answer por POST (r1, r2, ...)
+	 * 
+	 * Este método invoca una función con un parámetro cuyo valor será:
+	 * - 0 si la respuesta contestada es incorrecta
+	 * - 1 si el timeout expiró 
+	 * - 2 si la respuesta es correcta
 	 */
-	responder_pregunta = function(respuesta) { 
-		pregunta = preguntas[preguntas.length-1];
-		preguntas.pop();
-        pregunta.c = "r" + pregunta.c;
-		if(pregunta.c == respuesta) { 
-			// Añadir puntuación al usuario.
-			tiempo_restante = 5; // Tiempo transcurrido en segundos (siempre > 0)
-			puntuacion = puntuacion + Math.ceil(tiempo_restante); // Actualizar puntuación
-			
-			return true
-		}
-		else { 
-			// Como actualizamos la puntuación si no respondemos a la pregunta ??
-			// TODO
-			// puntuacion = 
-			return false
-		}
+	responder_pregunta = function(respuesta, callback) { 
+		clearTimeout(timeout);
+		$.post('/index.php?op=command&id=3&ac=answer',
+			{answer:respuesta},
+			function(response) {
+				resultado = response;
+				if(jQuery.type(callback) == "function") { 
+					callback(resultado);
+				}	
+			});
+	}
+	
+	/**
+	 * Este método es invocado cuando el usuario supera el timeout de la pregunta.
+	 * Envía una petición POST:
+	 * index.php?op=command&id=3&ac=timeout 
+	 * Este método invoca finalmente el callback pasado como parámetro después de haber
+	 * recibido la respuesta del servidor 
+	 */
+	enviar_timeout = function(callback) { 
+		$.post('/index.php?op=command&id=3&ac=timeout',
+			{},
+			function(response) {
+				if(jQuery.type(callback) == "function") { 
+					callback();
+				}	
+			});
+	}
+	
+	/**
+	 * Este método devuelve el número de segundos restantes que el usuario tiene para 
+	 * responder a la pregunta actual (Solo es válido después de haber invocado el método
+	 * siguiente_pregunta(), y de haber recibido la llamada por callback del servidor.
+	 */
+	tiempo_restante = function() {
+		tiempo_transcurrido = ((new Date().getTime() - timestamp) / 1000.0);
+		return answer_timeout - tiempo_transcurrido;
 	}
 	
 	
 	/**
 	 * Este método es invocado cuando el juego finaliza. 
-	 * Envía la puntuación final al servidor(haciendo una petición POST. 
-	 * La petición POST es /index.php?op=command&id=3&ac=actualizar_puntuacion. Se pasa como parámetro via POST la puntuación obtenida. 
-	 * El resultado de esta petición POST, es la ID de la partida que el usuario acaba de jugar.
-	 * Por último se redirecciona al jugador, a la página:
-	 * /index.php?op=view&id=4&match_id=<id_de_la_partida>
+	 * Se redirecciona al jugador, a la página con el postpartido.
+	 * La petición es:
+	 * /index.php?op=view&id=4
 	 * Antes de hacer la redirección, se invoca el callback que se pasa como parámetro.
 	 */
+	 
 	fin_juego = function(callback) { 
-		$.post('/index.php?op=command&id=3&ac=save_match', 
-			{puntuacion:puntuacion},
-			function(response) { 
-				if(jQuery.type(callback) == "function") { 
-					callback();
-				}
-				match_id = response;
-				location.replace('/index.php?op=view&id=4&match_id=' + match_id);
-			})
-	}
+		if(jQuery.type(callback) == "function") { 
+			callback();
+			}	
+		location.replace('/index.php?op=view&id=4');
+		}
 	
 });
