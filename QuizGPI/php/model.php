@@ -172,23 +172,35 @@ class Model
 	}
 	
 	
-	/** 
-	 * Almacena los resultados de una partida del juego.
-	 * Se debe pasar como parámetro un array con los siguientes campos:
-	 * - j1: ID del jugador 1
-	 * - p1: Puntuacion del jugador 1
-	 * - j2: ID del jugador 2
-	 * - p2: Puntuación del jugador 2
-	 * Los dos último parámetros se omiten la partida fue de un solo jugador.
-	 * Devuelve la id de la partida almacenada o false en caso de fallo
+	/**
+	 * Crea una partida nueva (1 jugador).
+	 * Inicializa la puntuación del jugador a 0.
+	 * Toma como parámetro la ID del usuario.
+	 * Devuelve como resultado la id de la nueva partida creada, o false en caso
+	 * de error
 	 */
-	public static function guardarResultadosPartida($datos) { 
-		$result = Facade::insertPartida($datos);
-		if($result)  { 
-			$id = $result;
-			return $id;
-		}
-		return false;
+	public static function nuevaPartida($user_id) { 
+		return Facade::insertPartida(array('j1' => $user_id, 'p1' => 0));
+	}
+	
+	/**
+	 * Crea una partida nueva (2 jugadores).
+	 * Inicializa la puntuación de ambos jugadores a 0.
+	 * Toma como parámetro las IDS de ambos jugadores (en forma de array)
+	 * Devuelve como resultado la ID de la nueva partida creada, o false en caso de error.
+	 * 
+	 */
+	public static function nuevaPartidaMultijugador($user_ids) { 
+		return Facade::insertPartida(array('j1' => $user_ids[0], 'j2' => $user_ids[1], 'p1' => 0, 'p2' => 0));
+	}
+	
+	/**
+	 * Este método incrementa la puntuación del usuario en una partida.
+	 * Toma como parámetros la id de la partida y la id del usuario respectivamente
+	 * Devuelve true si la puntuación se actualizó correctamente, false en caso contrario
+	 */
+	public static function actualizarPuntuacion($match_id, $user_id, $puntuacion) { 
+		return Facade::actualizarPuntuacion($match_id, $user_id, $puntuacion);
 	}
 }
 ?>

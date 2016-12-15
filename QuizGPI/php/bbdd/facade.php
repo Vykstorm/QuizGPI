@@ -107,7 +107,7 @@ class Facade
 	}
 	
 	/**
-	 * Devuelve como resultado el resultado de una query, que estará compuesta
+	 * Devuelve como retorno el resultado de una query, que estará compuesta
 	 * por una única fila con los siguientes valores (Si la partida fue MULTIJUGADOR):
 	 * - jugador1, jugador2 son los nombres de los jugadores que jugaron en la partida
 	 * - puntuacion1, puntuacion2 son sus puntuaciones correspondientes
@@ -123,6 +123,22 @@ class Facade
 			}
 			// fue partida de dos jugadores
 			return Facade::getInfoPartidaMultijugador($match_id);
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * Este método incrementa la puntuación del usuario en una partida.
+	 * Toma como parámetros la id de la partida y la id del usuario respectivamente
+	 * Devuelve true si la puntuación se actualizó correctamente, false en caso contrario
+	 */
+	public static function actualizarPuntuacion($match_id, $user_id, $puntuacion) { 
+		$query = 'UPDATE Partida SET puntuacion1=puntuacion1+' . strval($puntuacion) . ' WHERE id=' . $match_id . ' and usuario1=' . $user_id . ';';
+		$query .= 'UPDATE Partida SET puntuacion2=puntuacion2+' . strval($puntuacion) . ' WHERE id=' . $match_id . ' and usuario2=' . $user_id;
+		$result = Database::executeMultiQuery($query);
+		if($result) { 
+			return true;
 		}
 		return false;
 	}
@@ -148,9 +164,10 @@ class Facade
 		$p2 = strval($data["p2"]);
 		$query = 'INSERT INTO Partida (usuario1,usuario2,puntuacion1,puntuacion2) 
 		VALUES ('.$data["j1"].','.$data["j2"].','.$p1.','.$p2.')';
-		if(DataBase::execute($query))
+		
+		if($id = DataBase::executeInsert($query))
 		{
-			return DataBase::getLastId();
+			return $id;
 		}
 		else
 		{
@@ -166,9 +183,9 @@ class Facade
 	
 		$query = 'INSERT INTO Partida (usuario1, puntuacion1)
 		VALUES ('.$data["j1"].', '.$p1.')';
-		if(DataBase::execute($query))
+		if($id = DataBase::executeInsert($query))
 		{
-			return DataBase::getLastId();
+			return $id;
 		}
 		else
 		{
