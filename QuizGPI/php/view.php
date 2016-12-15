@@ -101,7 +101,7 @@ class View
     }
 
 	/* Carga la página de ranking */
-	public static function ranking($ranking)
+	public static function ranking($ranking, $infoJugador)
 	{
 		/* Obtenemos la página */
 		$pagina = View::getHtml('ranking');
@@ -123,8 +123,25 @@ class View
 		}
 			
 		$trozos[1] = implode('', $filas);
-		$texto = implode('', $trozos);
+		$pagina = implode('', $trozos);
 		
+		/* El usuario está entre los 10 primeros? */
+		$rank = $infoJugador['rank'];
+		$trozos = explode('~~PRANK~~', $pagina);
+		if($rank <= count($ranking)) { 
+			// Está entre los 10 primeros
+			$pagina = $trozos[0] . $trozos[2];
+		}
+		else { 
+			// No está entre los 10 primeros
+			$prank = $trozos[1];
+			foreach(array('#posicion#' => $infoJugador['rank'], '#jugador#' => $infoJugador['j'], '#puntuacion#' => $infoJugador['p']) as $etiqueta => $reemplazo) { 
+					$prank = str_replace($etiqueta, $reemplazo, $prank);
+			}
+			$pagina = $trozos[0] . $prank . $trozos[2];
+		}
+		
+		$texto = $pagina;
 		echo $texto;
 	}
 

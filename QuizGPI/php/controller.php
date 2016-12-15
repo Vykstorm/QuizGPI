@@ -281,10 +281,12 @@ class Controller
 		$n = 10; // Tamaño máximo del ranking
 		$ranking = Model::getRanking($n) or exit('Fallo al obtener el ranking');
 
+		// Obtenemos las estadísticas del jugador
+		$user_id = Session::getVar('userID');
+		$infoJugador = Model::getInfoJugador($user_id) or exit('Fallo al obtener los datos del jugador');
 		
 		/* Mostramos la pagina */
-		View::ranking($ranking);
-		
+		View::ranking($ranking, $infoJugador);
 	}
 	
 	/**
@@ -298,7 +300,6 @@ class Controller
 		
 		// Obtenemos la información de la partida.
 		$infoPartida = Model::getInfoPartida($match_id) or exit('No es posible obtener la información de partida');
-	
 		// Reemplazamos las etiquetas del HTML
 		// TODO...
 		$pagina = str_replace('##puntuacion##', strval($infoPartida['p1']), $pagina);

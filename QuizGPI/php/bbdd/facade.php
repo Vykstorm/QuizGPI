@@ -79,7 +79,7 @@ class Facade
 		$query = 
 		'SELECT name, puntuacion
 		FROM PuntuacionTotal INNER JOIN Usuario ON (PuntuacionTotal.id = Usuario.id)
-		ORDER BY puntuacion DESC
+		ORDER BY puntuacion DESC, Usuario.id ASC
 		LIMIT ' . $n;
 		return Database::execute($query);
 	}
@@ -123,6 +123,32 @@ class Facade
 			}
 			// fue partida de dos jugadores
 			return Facade::getInfoPartidaMultijugador($match_id);
+		}
+		return false;
+	}
+	
+	/** 
+	 * Este método devuelve información del jugador cuya ID es la indicada.
+	 * Devuelve un array con dos elementos:
+	 * - nombre: Es su nombre
+	 * - puntuacion: Es su puntuación total en el juego
+	 * - posicion: Es su posición en el ranking de jugadores.
+	 * Devuelve false en caso de error o si el jugador no existe.
+	 */
+	public static function getInfoJugador($user_id) { 
+		$query = 
+		'SELECT posicion, name nombre, puntuacion
+		FROM 
+			(SELECT @curRow := @curRow + 1 AS posicion, id, puntuacion 
+			FROM PuntuacionTotal 
+			JOIN    (SELECT @curRow := 0) r) AS Ranking
+			INNER JOIN 
+			Usuario
+			ON Ranking.id = Usuario.id
+		WHERE Usuario.id = ' . $user_id;
+		$result = Database::execute($query);
+		if($result) {
+			return mysqli_fetch_array($result); 
 		}
 		return false;
 	}
