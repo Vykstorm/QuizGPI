@@ -1,0 +1,51 @@
+.post-form {
+    width: 30rem;
+    height: 28rem;
+    position: fixed;
+    top: 50%;
+    margin-top: -14rem;
+    left: 50%;
+    margin-left: -15rem;
+    background-color: #ffffff;
+}
+
+.puntuacion {
+    height: 40%;
+    margin: auto;
+    padding-top: 20px;
+}
+
+.c100{
+    font-size: 150px !important;
+}
+
+.botones {
+    height: 60%;
+    margin: auto;
+}
+
+h1{
+    text-align: center !important;
+}
+
+a{
+    display: block !important;
+    margin: auto !important;
+    width: 50% !important;
+    align-self: center !important;
+    text-align: center !important;
+    height: 50px !important;
+    font-size: 22px !important;
+}
+
+#jugar:hover{
+    background-color: #58A7E4;
+}
+
+#menu:hover{
+    background-color: #FB4F00;
+}
+
+#ver_ranking:hover{
+    background-color: #18A91A;
+}
