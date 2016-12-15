@@ -202,5 +202,20 @@ class Model
 	public static function actualizarPuntuacion($match_id, $user_id, $puntuacion) { 
 		return Facade::actualizarPuntuacion($match_id, $user_id, $puntuacion);
 	}
+	
+	/** 
+	 * Este método devuelve información del jugador cuya ID es la indicada.
+	 * Devuelve un array con dos elementos:
+	 * - j: Es su nombre
+	 * - p: Es su puntuación total en el juego
+	 * - rank: Es su posición en el ranking de jugadores.
+	 * Devuelve false en caso de error o si el jugador no existe.
+	 */
+	public static function getInfoJugador($user_id) { 
+		$result = Facade::getInfoJugador($user_id);
+		if(!$result)
+			return false;
+		return array('rank' => intval($result['posicion']), 'p' => $result['puntuacion'], 'j' => $result['nombre']);
+	}
 }
 ?>
