@@ -1,0 +1,4 @@
+Tabla Usuario:   id (key), nombre (unico), contraseña
+Tabla partida:   id (key), usuario1 (fk), usuario2 (fk), puntuacion1, puntuacion2 (Historial de partidas)
+Tabla Temas:     id (key), nombre
+Tabla Preguntas: id (key), tema (fk), pregunta, respuesta1, respuesta2, respuesta3, respuesta4, cualeslacorrecta

@@ -1,7 +1,7 @@
 <?php
 
 require_once('bbdd/facade.php'); // Interfaz para acceso a la bbbd
-require_once('excel/excel.php');
+require_once('excel/PHPExcel.php'); // Clase para la generación de las hojas excel
 
 /*
 *	Clase para gestionar los datos de la aplicación.
@@ -217,5 +217,110 @@ class Model
 			return false;
 		return array('rank' => intval($result['posicion']), 'p' => $result['puntuacion'], 'j' => $result['nombre']);
 	}
+
+
+	/**
+	 * Este método recive un array en el que cada elemento es otro array que 
+	 * contiene la siguiente información:
+	 * - j: El nombre de un jugador.
+	 * - p: La puntuación del jugador.
+	 * Con los datos recividos genera la hoja excel 
+	**/
+	public static function genRankingSheet($data, $extra)
+	{
+		// Define la zona horaria
+		date_default_timezone_set('Europe/Madrid');
+
+		// Comprueba que el acceso se realiza via HTTP y no CLI
+		if(PHP_SAPI == 'cli')
+			die('Este archivo solo se puede ver desde un navegador web');
+
+		$objPHPExcel = new PHPExcel();
+
+		// Se asignan las propiedades del libro
+		$objPHPExcel->getProperties()->setCreator("QuizApp")
+		->setLastModifiedBy("QuizApp")
+		->setTitle("Ranking QuizApp") //Título
+		->setSubject("Ranking QuizApp") //Asunto
+		->setDescription("Ranking QuizApp") //Descripción
+		->setKeywords("ranking QuizApp") //Etiquetas
+		->setCategory("Excel QuizApp"); //Categoria
+
+		$titleSheet   = "Ranking QuizApp";
+		$titleColumns = array('PUESTO','JUGADOR','PUNTUACIÓN');
+		$endColumn    = "F";
+
+		// Se combinan las celdas C2 hasta E2 para colocar el título
+		$objPHPExcel->setActiveSheetIndex(0)
+		->mergeCells('C2:E2');
+
+		//Se agregan los titulos de la hoja, titulo y nombre de columnas
+		$objPHPExcel->setActiveSheetIndex(0)
+		->setCellValue('C2', $titleSheet) 
+		->setCellValue('C4', $titleColumns[0])
+		->setCellValue('D4', $titleColumns[1])
+		->setCellValue('E4', $titleColumns[2]);	
+
+		// Se itera el array pasado como parámetro y se insertan los dos en la hoja
+		$it = 5; // Empezamos desde la línea 5 en la hoja
+		$n  = 1; // Para ir metiendo los puestos de cada jugador			
+
+		foreach ($data as $key => $value) {			
+			$objPHPExcel->setActiveSheetIndex(0)
+			->setCellValue('C'.$it, $n)
+			->setCellValue('D'.$it, $value["j"])
+			->setCellValue('E'.$it, $value["p"]);		
+			$it++;
+			$n++;
+		}
+
+		// Si el jugador que va a descargar el ranking no aparece en el top n
+		// entonces se añade en un campo fuera del ranking su posicion, nombre y 
+		// puntuación. Los datos serán pasados por el parámetro $extra
+
+		/*
+		if(sizeof($extra) != 0)
+		{
+			$it += 2;
+
+			// Se combina las celdas para poner el título
+			$objPHPExcel->setActiveSheetIndex(0)
+			->mergeCells('C'.$it':E'.$it);			
+
+			//Se agregan los titulos de la hoja, titulo y nombre de columnas
+			$objPHPExcel->setActiveSheetIndex(0)
+			->setCellValue('C'.$it, 'Tu ranking en QuizApp es:') 
+			->setCellValue('C'.$it+1, $titleColumns[0])
+			->setCellValue('D'.$it+1, $titleColumns[1])
+			->setCellValue('E'.$it+1, $titleColumns[2]);
+
+			$it += 2;
+
+			$objPHPExcel->setActiveSheetIndex(0)
+			->setCellValue('C'.$it, $extra["pos"])
+			->setCellValue('D'.$it, $extra["j"])
+			->setCellValue('E'.$it, $extra["p"]);
+		}
+		*/
+		
+		// Se asigna el nombre a la hoja
+		$objPHPExcel->getActiveSheet()->setTitle('Ranking QuizApp');
+
+		// Se activa la hoja para que se muestre cuando se abre el archivo
+		$objPHPExcel->setActiveSheetIndex(0);
+
+		// Se manda el archivo al navegador web, con el nombre que se indica, en formato 2007
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+		// Se le asigna un nombre por defecto
+		header('Content-Disposition: attachment;filename="Ranking QuizApp.xlsx"');
+
+		header('Cache-Control: max-age=0');
+
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		$objWriter->save('php://output');
+		exit;
+	}
+
 }
 ?>
