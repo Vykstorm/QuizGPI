@@ -71,7 +71,7 @@ class Controller
 					
 					// Generamos las preguntas que el jugador debe responder
 					$tema = 'Informatica'; 
-					$num_preguntas = 4;
+					$num_preguntas = 5;
 					$preguntas = Model::getPreguntas($num_preguntas, $tema) or exit('Fallo al generar las preguntas');
 					
 					// Almacenamos la ID de la partida como variable de sesión.
