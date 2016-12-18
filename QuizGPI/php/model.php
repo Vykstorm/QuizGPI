@@ -1,6 +1,7 @@
 <?php
 
 require_once('bbdd/facade.php'); // Interfaz para acceso a la bbbd
+require_once('bbdd/database.php');
 require_once('excel/PHPExcel.php'); // Clase para la generación de las hojas excel
 
 /*
@@ -128,6 +129,20 @@ class Model
     }
     
     /**
+     * Este método devuelve un objeto de la clase MultiplayerQueue que puede manipularse 
+     * y su comportamiento es igual que una estructura de datos de tipo cola, solo que los
+     * datos están en la base de datos, y cualquier cambio es persistente.
+     * Esta cola almacena los usuarios que quedan a la espera de otro jugador.
+     */
+    public static function getMultiplayerQueue() { 
+		if (Model::$multiplayer_queue == null) {
+				Model::$multiplayer_queue = new MultiplayerQueue();
+		}
+		return Model::$multiplayer_queue;
+	}
+	private static $multiplayer_queue = null;
+    
+    /**
      * Devuelve un array con las n mejores puntuaciones del juego.
      * El valor de retorno debe ser un array. Cada elemento del array es un
      * array asociativo con la siguiente estructura: array('j' => nombre_jugador, 'p' => puntuacion);
@@ -154,7 +169,6 @@ class Model
 	 * - p2: Puntuación del jugador 2 (NULL si la partida fue de 1 solo jugador)
 	 * Si la partida fue de un único jugador, se omiten los campos j2, p2
 	 * Este método toma como parámetro la ID de la partida.
-	 * Lanza un error o una excepción en el caso en el que la ID de la partida no sea válida.
 	 * Devuelve false en caso de fallo
 	 */
 	public static function getInfoPartida($match_id) { 
@@ -171,6 +185,17 @@ class Model
 		return false;
 	}
 	
+	/**
+	 * Devuelve un objeto de la clase "MultiplayerGame", que representará una partida
+	 * multijugador cuya ID es la que se especifíca como parámetro 
+	 * Devuelve false en caso de error, o si la ID no está asociada con una partida multijugador.
+	 */
+	public static function getPartidaMultijugador($match_id) { 
+		$info = Model::getInfoPartida($match_id);
+		if(!$info || !isset($row['j2']))
+			return false;
+		return new MultiplayerGame($match_id, array($row['j1'], $row['j2']), array($row['p1'], $row['p2']));
+	}
 	
 	/**
 	 * Crea una partida nueva (1 jugador).
@@ -186,12 +211,16 @@ class Model
 	/**
 	 * Crea una partida nueva (2 jugadores).
 	 * Inicializa la puntuación de ambos jugadores a 0.
-	 * Toma como parámetro las IDS de ambos jugadores (en forma de array)
-	 * Devuelve como resultado la ID de la nueva partida creada, o false en caso de error.
+	 * Toma como parámetro las IDS de ambos jugadores
+	 * Devuelve como resultado un objeto de tipo MultiplayerGame que representa la partida.
 	 * 
 	 */
 	public static function nuevaPartidaMultijugador($user_ids) { 
-		return Facade::insertPartida(array('j1' => $user_ids[0], 'j2' => $user_ids[1], 'p1' => 0, 'p2' => 0));
+		$result = Facade::insertPartida(array('j1' => $user_ids[0], 'j2' => $user_ids[1], 'p1' => 0, 'p2' => 0));
+		if(!$result)
+			return false;
+		$match_id = $result;
+		return new MultiplayerGame($match_id, $user_ids);
 	}
 	
 	/**
@@ -323,4 +352,214 @@ class Model
 	}
 
 }
+
+
+class MultiplayerQueue
+{
+	private $next_player;
+	private $is_locked;
+	private $mysqli;
+	
+	public function __construct()
+	{
+		$this->next_player  = null;
+		$this->is_locked = false;
+		$this->mysqli = DataBase::connect(); 
+	}
+	
+	public function __destruct()
+	{
+		DataBase::close($this->mysqli);
+	}
+	
+	/**
+	 * Devuelve el siguiente jugador (El primero que entró en la cola) y lo
+	 * elimina de la cola.
+	 * Lanza una excepción en caso de error.
+	 */
+	public function avanzar() 
+	{
+		$next_player = $this->next_player;
+		$this->eliminarPrimero();
+		return $next_player;
+	}
+	
+	/**
+	 * Devuelve el siguiente jugador (El primero que entró en la cola), pero
+	 * no lo elimina de la cola.
+	 * Lanza una excepción si no hay nadie en la cola.
+	 */
+	private function primero() 
+	{
+		if($this->estaVacia())
+			throw new Exception('No hay ningun jugador esperando!');
+		return $this->next_player;
+	}
+	
+	/**
+	 * Elimina el primer jugador de la lista (El primero que entró en la cola).
+	 * Lanza una excepción si no hay ningún jugador en la cola.
+	 */
+	private function eliminarPrimero() 
+	{
+		if($this->estaVacia())
+			throw new Exception('No hay ningun jugador esperando!');
+		if(!Facade::popPlayerWaiting($this->mysqli))
+			throw new Exception('Error al eliminar jugador en espera');
+		$this->next_player = null;
+	}
+	
+	/**
+	 * Añade un usuario nuevo a la cola de espera.
+	 * @return Devuelve false si el jugador ya está en cola, true en caso contrario.
+	 * Lanza una excepción en caso de error
+	 */
+	public function encolar($user_id)
+	{
+		Facade::pushPlayerWaiting($this->mysqli, $user_id);
+	}
+	
+	/**
+	 * Comprueba si la cola de usuarios está vacía.
+	 * @return Devuelve true si está vacía. false en caso contrario.
+	 */
+	public function estaVacia() 
+	{
+		if(!$this->next_player) { 
+			$this->next_player = Facade::getFirstPlayerWaiting($this->mysqli);
+			if(!is_null($this->next_player) && !$this->next_player)
+				throw new Exception('Error al obtener el siguiente jugador en la sala de espera');
+		}	
+		return is_null($this->next_player);
+	}
+	
+	/**
+	 * @return Devuelve true si el usuario con la id indicada está en cola, false en caso contrario.
+	 */
+	public function estaEnCola($user_id)
+	{
+		$is_waiting = Facade::isPlayerWaiting($this->mysqli, $user_id);
+		if(is_null($is_waiting))
+			throw new Exception('Error al comprobar si el jugador esta en espera');
+		return $is_waiting;
+	}
+	
+	
+	/**
+	 * Bloquea la cola de jugadores esperando. Posteriores alteraciones de la cola
+	 * serán atómicas, hasta que se invoque el método unlock 
+	 * 
+	 */
+	public function lock() 
+	{
+		if($this->is_locked)
+			throw new Exception('La sala de espera ya esta bloqueada'); 
+		if(!Facade::lockMultiplayerQueue($this->mysqli))
+			throw new Exception('Error al bloquear la sala de espera');
+		$this->is_locked = true;
+	}
+	
+	/**
+	 * Desbloquea la cola de jugadores esperando (habiendo previamente bloqueado con el 
+	 * método unlock
+	 */
+	public function unlock() 
+	{
+		if(!$this->is_locked)
+			throw new Exception('La sala de espera ya esta desbloqueada');
+		$this->is_locked = false;
+		if(!Facade::unlockMultiplayerQueue($this->mysqli))
+			throw new Exception('Error al desbloquear la sala de espera');
+	}
+	
+}
+	
+/**
+ * Esta clase representa un partida multijugador 
+ */
+class MultiplayerGame 
+{
+	private $player_ids;
+	private $player_scores;
+	private $match_id;
+	private $current_player;
+	
+	public function __construct($match_id, $player_ids, $player_scores = array(0, 0))
+	{
+		$this->match_id = $match_id;
+		$this->player_ids = $player_ids;
+		$this->player_scores = $player_scores;
+	}
+	
+	/**
+	 * Este método devuelve la ID de usuario del jugador que tiene el turno en la
+	 * partida actualmente (accede a la BD)
+	 */
+	public function getJugadorActual() 
+	{
+		$current_player = Facade::jugadorTurnoActual($this->getID());
+		if(!$current_player)
+			throw new Exception('Fallo al obtener el jugador con el turno actual de la partida');
+	
+		return $current_player;
+	}
+	
+	/**
+	 * Este método cambia el turno al jugador contrincante.
+	 * Además, actualiza la puntuación del jugador actual, incrementandola con la
+	 * cantidad indicada.
+	 */
+	public function cambiarTurno($puntuacion) 
+	{
+		$current_player = $this->getJugadorActual();
+		$prev_player = $this->current_player;
+		if($current_player == $this->player_ids[0])
+		{
+			$this->player_scores[0] += $puntuacion;
+			$current_player = $this->player_ids[1];
+		}
+		else 
+		{
+			$this->player_scores[1] += $puntuacion;
+			$current_player = $this->player_ids[0];
+		}
+		// Actualizar puntuación del jugador anterior en la BD
+		if(!Facade::actualizarPuntuacion($this->getID(), $prev_player, $puntuacion))
+			throw new Exception('Fallo al actualizar la puntuacion de un jugador');
+		// Cambiar el turno (actualizar BD)...
+		if(!Facade::cambiarTurno($this->gtID(), $current_player))
+			throw new Exception('Fallo al cambiar el turno de la partida');
+	}
+	
+	/**
+	 * Este método retorna cuando el jugador cuya ID se indica como parámetro, ha
+	 * conseguido obtener el turno de la partida.
+	 */
+	public function esperarTurno($player)
+	{
+		while($this->getJugadorActual() != $player) { 
+			sleep(1);
+		}
+	}
+	
+	/**
+	 * Devuelve un array con la información de la partida, con los siguientes campos:
+	 * -j1, j2: Las IDs de los jugadores
+	 * -p1, p2: Sus puntuaciones
+	 */ 
+	public function getInfo() 
+	{
+		return array('j1' => $this->player_ids[0], 'j2' => $this->player_ids[1], 'p1' => $this->player_scores[0], 'p2' => $this->player_scores[1]);
+	}
+	
+	/**
+	 * Devuelve la ID de la partida
+	 */
+	public function getID()
+	{
+		return $this->match_id;
+	}
+}
+
+
 ?>
