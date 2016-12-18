@@ -5,7 +5,6 @@ require_once('model.php');
 require_once('view.php'); 
 include('session/session.php'); // Manejo de sesiones
 
-
 class Controller
 {
 	/* Metodo principal del controlador */
@@ -82,8 +81,40 @@ class Controller
 					View::gameScreen();
 					break;
 
-				case '8': // Carga juego, pantalla (2 jugadores)
-					// TODO
+				case '9': // Sala de espera para jugar con otra persona (Matchmaking)
+					$player = Session::getVar('userID');
+											
+					$queue = Model::getMultiplayerQueue();
+					$queue->lock();
+					// Comprobamos si el jugador ya está en cola
+					if($queue->estaEnCola($player))
+						exit('Ya estas en cola!');
+
+					// Comprobamos si hay algún jugador en la sala de espera
+					if(!$queue->estaVacia())
+					{
+						/* Si hay alguno, eliminar a dicho jugador de la sala de espera
+						(le emparejamos con el usuario que inicio esta petición) */
+					
+						$player2 = $queue->avanzar();
+						$queue->unlock();
+						
+						/* Además, creamos una partida para los dos jugadores */
+						$partida = Model::nuevaPartidaMultijugador(array($player, $player2));
+					}
+					else 
+					{
+						/* Si no hay nadie, el jugador debe esperar a otro... */
+						$queue->encolar($player);
+						do
+						{
+							$queue->unlock();
+							sleep(1);
+							$queue->lock();
+						}while($queue->estaEnCola($player));
+						$queue->unlock();
+					}
+				
 					break;
 					
 				case '7': // Carga la SIGUIENTE pregunta del juego.
