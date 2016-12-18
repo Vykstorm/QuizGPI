@@ -52,6 +52,10 @@ class View
 				break;
 			case 'ranking':
 				$path =  'html/ranking.html';
+				break;
+			case 'matchmaking':
+				$path = 'html/matchmaking.html';
+				break;
 			default:
 				# code...
 				break;
@@ -144,6 +148,12 @@ class View
 		$texto = $pagina;
 		echo $texto;
 	}
-
+	
+	/* Carga la página de matchmaking..*/
+	public static function matchmaking() 
+	{
+		$text = View::getHtml('matchmaking');
+		echo $text;
+	}
 }
 ?>
