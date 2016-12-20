@@ -307,30 +307,31 @@ class Model
 		// entonces se añade en un campo fuera del ranking su posicion, nombre y 
 		// puntuación. Los datos serán pasados por el parámetro $extra
 
-		/*
-		if(sizeof($extra) != 0)
+		
+		if(!Model::isPlayerInRank($rank, $player))
 		{
 			$it += 2;
 
 			// Se combina las celdas para poner el título
 			$objPHPExcel->setActiveSheetIndex(0)
-			->mergeCells('C'.$it':E'.$it);			
+			->mergeCells('C'.$it.':E'.$it);			
 
 			//Se agregan los titulos de la hoja, titulo y nombre de columnas
+			$it2 = $it+1;
 			$objPHPExcel->setActiveSheetIndex(0)
 			->setCellValue('C'.$it, 'Tu ranking en QuizApp es:') 
-			->setCellValue('C'.$it+1, $titleColumns[0])
-			->setCellValue('D'.$it+1, $titleColumns[1])
-			->setCellValue('E'.$it+1, $titleColumns[2]);
+			->setCellValue('C'.$it2, $titleColumns[0])
+			->setCellValue('D'.$it2, $titleColumns[1])
+			->setCellValue('E'.$it2, $titleColumns[2]);
 
 			$it += 2;
 
 			$objPHPExcel->setActiveSheetIndex(0)
-			->setCellValue('C'.$it, $extra["pos"])
-			->setCellValue('D'.$it, $extra["j"])
-			->setCellValue('E'.$it, $extra["p"]);
+			->setCellValue('C'.$it, $player["rank"])
+			->setCellValue('D'.$it, $player["j"])
+			->setCellValue('E'.$it, $player["p"]);
 		}
-		*/
+		
 		
 		// Se asigna el nombre a la hoja
 		$objPHPExcel->getActiveSheet()->setTitle('Ranking QuizApp');
@@ -351,6 +352,20 @@ class Model
 		exit;
 	}
 
+	/** 
+	 *	Comprueba si un usuario se encuentra dentro del ranking
+	 *	Devuelve TRUE O FALSE 
+	 */
+	private static function isPlayerInRank($rank, $player)
+	{
+		foreach ($rank as $k => $v) {
+			if($v["j"] == $player["j"])
+				return true;
+		}
+		return false;
+	}
+
+//END OF CLASS Model
 }
 
 
