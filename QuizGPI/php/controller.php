@@ -280,9 +280,9 @@ class Controller
                     header("Location:index.php?op=view&id=1");
                     break;
                     
-                case '5': // Genera la hoja excel del ranking
-                	$rank   = Model::getRanking(self::$longRanking);                	
-                	$player = Model::getInfoJugador(Session::getVar('userID'));
+                case '6': // Genera la hoja excel del ranking                	
+                	$rank   = Model::getRanking(self::$longRanking) or die('Error del manco de victor');                	
+                	$player = Model::getInfoJugador(Session::getVar('userID')) or die('Error del manco de victor');                	
                 	Model::genRankingExcel($rank, $player);
 				default:
 					echo "Error. Controller::system(), op=command.";
