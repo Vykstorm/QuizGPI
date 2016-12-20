@@ -5,7 +5,6 @@ require_once('model.php');
 require_once('view.php'); 
 include('session/session.php'); // Manejo de sesiones
 
-
 class Controller
 {
 	/* Metodo principal del controlador */
@@ -83,11 +82,13 @@ class Controller
 					// Mostramos la pantalla del juego.
 					View::gameScreen();
 					break;
-
-				case '8': // Carga juego, pantalla (2 jugadores)
-					// TODO
+			
+				case '8': // Sala de espera para entrar al modo multijugador.
+					View::matchmaking();
 					break;
-					
+				case '9': //  Pantalla MULTIJUGADOR
+				
+					break;
 				case '7': // Carga la SIGUIENTE pregunta del juego.
 					if (!Session::getVar('matchID')) { 
 						exit('Todavia no ha comenzado la partida!');
@@ -163,7 +164,7 @@ class Controller
                     else{ View::register($ret); }
                     break;  
                     
-				case '3': //Gestionar manejo de usuarios & partidas
+				case '3': //Gestionar manejo de usuarios & partidas (1 jugador)
 					if (!Session::getVar('matchID')) // Comprobar que el usuario está en una partida.
 						break; 
 					switch ($var['ac']) {
@@ -233,7 +234,46 @@ class Controller
 							break;
 					}
 					break;
-                    
+                case '5': // Gestión de manejo de usuario & Partidas MULTIJUGADOR
+					switch($var['ac']) { 
+						case 'join': // Petición para añadir al usuario al matchmaking.
+				
+							$player = Session::getVar('userID');
+													
+							$queue = Model::getMultiplayerQueue();
+							$queue->lock();
+							// Comprobamos si el jugador ya está en cola
+							if($queue->estaEnCola($player))
+								exit('Ya estas en cola!');
+
+							// Comprobamos si hay algún jugador en la sala de espera
+							if(!$queue->estaVacia())
+							{
+								/* Si hay alguno, eliminar a dicho jugador de la sala de espera
+								(le emparejamos con el usuario que inicio esta petición) */
+							
+								$player2 = $queue->avanzar();
+								$queue->unlock();
+								
+								/* Además, creamos una partida para los dos jugadores */
+								$partida = Model::nuevaPartidaMultijugador(array($player, $player2));
+							}
+							else 
+							{
+								/* Si no hay nadie, el jugador debe esperar a otro... */
+								$queue->encolar($player);
+								do
+								{
+									$queue->unlock();
+									sleep(1);
+									$queue->lock();
+								}while($queue->estaEnCola($player));
+								$queue->unlock();
+							}					
+							break;
+					}
+					break;
+                   
                 case '4':
                     Session::destroy();
                     header("Location:index.php?op=view&id=1");

@@ -35,6 +35,8 @@ class Facade
         return DataBase::execute($query);
     }
     
+    ################ OBTENER INFO DE PREGUNTAS ##################
+    
     /* Devuleve n preguntas del tema t*/
     public static function getPreguntas($n, $t)
     {
@@ -67,6 +69,7 @@ class Facade
 		}
     }
     
+    ########################### RANKING #########################
     /**
      * Devuelve el ranking de puntuaciones más altas de los usuarios
      * (solo las primeras n puntuaciones).
@@ -84,6 +87,7 @@ class Facade
 		return Database::execute($query);
 	}
 	
+	###################### OBTENER INFO DE PARTIDAS ##########################
 	
 	private static function getInfoPartidaMultijugador($match_id) { 
 		$query = 
@@ -127,6 +131,7 @@ class Facade
 		return false;
 	}
 	
+	###################### OBTENER INFO DE JUGADORES ############
 	/** 
 	 * Este método devuelve información del jugador cuya ID es la indicada.
 	 * Devuelve un array con dos elementos:
@@ -153,6 +158,7 @@ class Facade
 		return false;
 	}
 	
+	############## CREACIÓN DE PARTIDAS Y ACTUALIZACIÓN DE PUNTUACIONES #################
 	
 	/**
 	 * Este método incrementa la puntuación del usuario en una partida.
@@ -193,6 +199,12 @@ class Facade
 		
 		if($id = DataBase::executeInsert($query))
 		{
+			// Debemos guardar el estado para partidas multijugador.
+			$query = 'INSERT INTO EstadoPartidaMultijugador(id, turno_actual) VALUES(' . $id . ', ' . $data['j1'] . ')';
+			$result = DataBase::executeInsert($query);
+			if(!$result) 
+				return false;
+			
 			return $id;
 		}
 		else
@@ -218,5 +230,92 @@ class Facade
 			return 0;
 		}
 	} 
+	
+	############# MATCHMAKING MULTIPLAYER #############
+	/**
+	 * Este método bloquea la tabla donde se almacenan las IDs de los usuarios
+	 * que están en espera para jugar el modo multijugador de forma que las siguientes
+	 * operaciones sobre dicha tabla son atómicas.
+	 * Después de bloquear la tabla, no se cierra la conexión a la BD...
+	 * Devuelve false en caso de error.
+	 */
+	public static function lockMultiplayerQueue($mysqli) 
+	{
+		$query = 'LOCK TABLES MultiPlayerQueue WRITE';
+		$result = Database::execute($query, $mysqli, false);
+		//$result = true;
+		return $result;
+	}
+	
+	/**
+	 * Este método desbloquea la tabla donde se almacenan las IDs de los usuarios
+	 * que están esperando para jugar el modo multijugador 
+	 */
+	public static function unlockMultiplayerQueue($mysqli)
+	{
+		$query = 'UNLOCK TABLES';
+		$result = DataBase::execute($query, $mysqli, false);
+		//$result = true;
+		return $result;
+	}
+	
+	/**
+	 * Este método devuelve la ID de usuario del primer jugador que entró en la sala
+	 * de espera para jugar el modo multijugador. Devuelve false en caso de error
+	 * y null si no hay ningún jugador esperando.
+	 */
+	 public static function getFirstPlayerWaiting($mysqli)
+	 {
+		 $query = 'SELECT id FROM MultiPlayerQueue ORDER BY timestamp ASC LIMIT 1';
+		 $result = DataBase::execute($query, $mysqli, false);
+		 if(!$result) 
+			return false;
+		 $row = mysqli_fetch_array($result);
+		 if(!$row) 
+			return null;
+		 return $row['id'];
+	 }
+	 
+	 /**
+	  * Este método elimina el primer jugador que entró en la sala de espera para jugar
+	  * al modo multijugador
+	  */
+	 public static function popPlayerWaiting($mysqli)
+	 {
+		 $user_id = Facade::getFirstPlayerWaiting($mysqli);
+		 echo mysqli_error($mysqli);
+		 if(!$user_id) 
+			return false;
+		 $query = 'DELETE FROM MultiPlayerQueue WHERE id=' . $user_id;
+		 $result = DataBase::execute($query, $mysqli, false);
+		 return $result;
+	 }
+	 
+	 /**
+	  * Este método añade un jugador a la sala de espera para jugar modo multijugador
+	  */
+	 public static function pushPlayerWaiting($mysqli, $user_id)
+	 {
+		 $query = 'INSERT INTO MultiPlayerQueue(id) VALUES(' . $user_id . ')';
+		 $result = DataBase::execute($query, $mysqli, false);
+		 return $result;
+	 }
+	 
+	 /**
+	  * Este método comprueba si un jugador está en espera para jugar el modo multijugador
+	  */
+	 public static function isPlayerWaiting($mysqli,$user_id)
+	 {
+		 $query = 'SELECT id FROM MultiPlayerQueue WHERE id = ' . $user_id;
+		 $result = DataBase::execute($query, $mysqli, false);
+		 if(!$result) 
+			return null;
+		 if(mysqli_fetch_array($result))
+			return true;
+		 return false;
+	 }
+	 
+	 #################### MULTIJUGADOR ##########################
+	 
 }
 ?>
