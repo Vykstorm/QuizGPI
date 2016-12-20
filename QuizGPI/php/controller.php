@@ -15,6 +15,8 @@ class Controller
 		// Iniciamos la sesion
 		Controller::initSession();
 
+		// Se define el tamaño del ranking
+		$longRanking = 10;
         
         /*    NO EXISTE SESION    */
         if(Controller::checkSession() == false){
@@ -237,6 +239,10 @@ class Controller
                     header("Location:index.php?op=view&id=1");
                     break;
                     
+                case '5': // Genera la hoja excel del ranking
+                	$rank   = Model:getRanking($longRanking);                	
+                	$player = Model:getInfoJugador(Session:getVar('userID'));
+                	Model:genRankingExcel($rank, $player);
 				default:
 					echo "Error. Controller::system(), op=command.";
 					print_r($var);
@@ -278,8 +284,8 @@ class Controller
 	public static function ranking()
 	{
 		/* Obtenemos el ranking de puntuaciones */
-		$n = 10; // Tamaño máximo del ranking
-		$ranking = Model::getRanking($n) or exit('Fallo al obtener el ranking');
+		//$n = 10; // Tamaño máximo del ranking
+		$ranking = Model::getRanking($longRanking) or exit('Fallo al obtener el ranking');
 
 		// Obtenemos las estadísticas del jugador
 		$user_id = Session::getVar('userID');

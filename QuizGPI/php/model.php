@@ -226,7 +226,7 @@ class Model
 	 * - p: La puntuación del jugador.
 	 * Con los datos recividos genera la hoja excel 
 	**/
-	public static function genRankingSheet($data, $extra)
+	public static function genRankingExcel($rank, $player)
 	{
 		// Define la zona horaria
 		date_default_timezone_set('Europe/Madrid');
@@ -265,7 +265,7 @@ class Model
 		$it = 5; // Empezamos desde la línea 5 en la hoja
 		$n  = 1; // Para ir metiendo los puestos de cada jugador			
 
-		foreach ($data as $key => $value) {			
+		foreach ($rank as $key => $value) {			
 			$objPHPExcel->setActiveSheetIndex(0)
 			->setCellValue('C'.$it, $n)
 			->setCellValue('D'.$it, $value["j"])
