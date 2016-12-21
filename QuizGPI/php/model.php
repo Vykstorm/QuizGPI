@@ -185,17 +185,7 @@ class Model
 		return false;
 	}
 	
-	/**
-	 * Devuelve un objeto de la clase "MultiplayerGame", que representará una partida
-	 * multijugador cuya ID es la que se especifíca como parámetro 
-	 * Devuelve false en caso de error, o si la ID no está asociada con una partida multijugador.
-	 */
-	public static function getPartidaMultijugador($match_id) { 
-		$info = Model::getInfoPartida($match_id);
-		if(!$info || !isset($row['j2']))
-			return false;
-		return new MultiplayerGame($match_id, array($row['j1'], $row['j2']), array($row['p1'], $row['p2']));
-	}
+
 	
 	/**
 	 * Crea una partida nueva (1 jugador).
@@ -212,7 +202,7 @@ class Model
 	 * Crea una partida nueva (2 jugadores).
 	 * Inicializa la puntuación de ambos jugadores a 0.
 	 * Toma como parámetro las IDS de ambos jugadores
-	 * Devuelve como resultado un objeto de tipo MultiplayerGame que representa la partida.
+	 * Devuelve como resultado la ID de la partida creada.
 	 * 
 	 */
 	public static function nuevaPartidaMultijugador($user_ids) { 
@@ -220,7 +210,7 @@ class Model
 		if(!$result)
 			return false;
 		$match_id = $result;
-		return new MultiplayerGame($match_id, $user_ids);
+		return $match_id;
 	}
 	
 	/**
@@ -488,93 +478,5 @@ class MultiplayerQueue
 	}
 	
 }
-	
-/**
- * Esta clase representa un partida multijugador 
- */
-class MultiplayerGame 
-{
-	private $player_ids;
-	private $player_scores;
-	private $match_id;
-	private $current_player;
-	
-	public function __construct($match_id, $player_ids, $player_scores = array(0, 0))
-	{
-		$this->match_id = $match_id;
-		$this->player_ids = $player_ids;
-		$this->player_scores = $player_scores;
-	}
-	
-	/**
-	 * Este método devuelve la ID de usuario del jugador que tiene el turno en la
-	 * partida actualmente (accede a la BD)
-	 */
-	public function getJugadorActual() 
-	{
-		$current_player = Facade::jugadorTurnoActual($this->getID());
-		if(!$current_player)
-			throw new Exception('Fallo al obtener el jugador con el turno actual de la partida');
-	
-		return $current_player;
-	}
-	
-	/**
-	 * Este método cambia el turno al jugador contrincante.
-	 * Además, actualiza la puntuación del jugador actual, incrementandola con la
-	 * cantidad indicada.
-	 */
-	public function cambiarTurno($puntuacion) 
-	{
-		$current_player = $this->getJugadorActual();
-		$prev_player = $this->current_player;
-		if($current_player == $this->player_ids[0])
-		{
-			$this->player_scores[0] += $puntuacion;
-			$current_player = $this->player_ids[1];
-		}
-		else 
-		{
-			$this->player_scores[1] += $puntuacion;
-			$current_player = $this->player_ids[0];
-		}
-		// Actualizar puntuación del jugador anterior en la BD
-		if(!Facade::actualizarPuntuacion($this->getID(), $prev_player, $puntuacion))
-			throw new Exception('Fallo al actualizar la puntuacion de un jugador');
-		// Cambiar el turno (actualizar BD)...
-		if(!Facade::cambiarTurno($this->gtID(), $current_player))
-			throw new Exception('Fallo al cambiar el turno de la partida');
-	}
-	
-	/**
-	 * Este método retorna cuando el jugador cuya ID se indica como parámetro, ha
-	 * conseguido obtener el turno de la partida.
-	 */
-	public function esperarTurno($player)
-	{
-		while($this->getJugadorActual() != $player) { 
-			sleep(1);
-		}
-	}
-	
-	/**
-	 * Devuelve un array con la información de la partida, con los siguientes campos:
-	 * -j1, j2: Las IDs de los jugadores
-	 * -p1, p2: Sus puntuaciones
-	 */ 
-	public function getInfo() 
-	{
-		return array('j1' => $this->player_ids[0], 'j2' => $this->player_ids[1], 'p1' => $this->player_scores[0], 'p2' => $this->player_scores[1]);
-	}
-	
-	/**
-	 * Devuelve la ID de la partida
-	 */
-	public function getID()
-	{
-		return $this->match_id;
-	}
-}
-
 
 ?>
