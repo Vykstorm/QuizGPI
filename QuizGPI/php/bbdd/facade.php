@@ -145,8 +145,8 @@ class Facade
 		'SELECT posicion, name nombre, puntuacion
 		FROM 
 			(SELECT @curRow := @curRow + 1 AS posicion, id, puntuacion 
-			FROM PuntuacionTotal 
-			JOIN    (SELECT @curRow := 0) r) AS Ranking
+			FROM (SELECT * FROM PuntuacionTotal ORDER BY puntuacion DESC) AS Puntuacion
+			JOIN    (SELECT @curRow := 1) r) AS Ranking
 			INNER JOIN 
 			Usuario
 			ON Ranking.id = Usuario.id
