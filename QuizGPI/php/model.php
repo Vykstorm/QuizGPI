@@ -330,7 +330,8 @@ class Model
 		$objPHPExcel->setActiveSheetIndex(0);
 
 		// Se manda el archivo al navegador web, con el nombre que se indica, en formato 2007
-		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		//header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Type: application/vnd.ms-excel');		
 
 		// Se le asigna un nombre por defecto
 		header('Content-Disposition: attachment;filename="Ranking QuizApp.xlsx"');
