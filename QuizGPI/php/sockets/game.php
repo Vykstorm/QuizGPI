@@ -136,6 +136,9 @@ class Game implements MessageComponentInterface {
             //Terminar partida si ambos han respondido 5 preguntas
             if(($this->player1Stage >= 5) && ($this->player2Stage >= 5)){
                 
+                //Insertar puntuacion final en el ranking (registro de partidas)
+                Facade::insertPartida(array('j1' => $this->player1ID, 'j2' => $this->player2ID, 'p1' => $this->player1Score, 'p2' => $this->player2Score));
+                
                 //Send final match message
                 $this->sendMatchEnd();
                 
@@ -152,6 +155,28 @@ class Game implements MessageComponentInterface {
                 $this->player2Stage = 0;
             }
 
+        }else if($data['type'] == 'disconnect'){
+            $player = $data['player'];
+            
+            if($player == $this->player1ID){
+                $this->player1Score = 0;
+            }
+            
+            else if($player == $this->player2ID){
+                $this->player2Score = 0;
+            }
+            
+            //End match match message
+            Facade::insertPartida(array('j1' => $this->player1ID, 'j2' => $this->player2ID, 'p1' => $this->player1Score, 'p2' => $this->player2Score));
+            $this->sendMatchEnd();
+            $this->player1Conn->close();
+            $this->player2Conn->close();
+            $this->player1Conn = null;
+            $this->player2Conn = null;
+            $this->player1Score = 0;
+            $this->player2Score = 0;  
+            $this->player1Stage = 0;
+            $this->player2Stage = 0;
         }
 
     }
@@ -205,10 +230,13 @@ class Game implements MessageComponentInterface {
         $p1 = 0;
         $p2 = 0;
         
-        if($this->player1Score >= $this->player2Score){
+        if($this->player1Score > $this->player2Score){
             $p1 = 1;
-        }else{
+        }else if($this->player1Score < $this->player2Score){
             $p2 = 1;
+        }else{
+            $p1 = 2;
+            $p2 = 2;
         }
     
         $msg1 = array( 

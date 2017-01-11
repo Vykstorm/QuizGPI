@@ -265,7 +265,8 @@ class Controller
 								$queue->unlock();
 								
 								/* Además, creamos una partida para los dos jugadores */
-								$partida = Model::nuevaPartidaMultijugador(array($player, $player2));
+								//$partida = Model::nuevaPartidaMultijugador(array($player, $player2));
+                                //Esto se hace ahora con los websockets en una peticion GET nueva
 							}
 							else 
 							{

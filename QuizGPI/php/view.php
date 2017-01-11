@@ -109,8 +109,10 @@ class View
 		$text = View::getHtml('mpPostPartido');
         if($resultado == '1'){
             $text = str_replace("##RESULTADO##", '¡HAS GANADO!', $text); 
-        }else{
+        }else if($resultado == '0'){
             $text = str_replace("##RESULTADO##", 'HAS PERDIDO', $text); 
+        }else{
+            $text = str_replace("##RESULTADO##", 'EMPATE', $text); 
         }
         
         $text = str_replace("##puntuacion##", $puntuacion, $text); 
