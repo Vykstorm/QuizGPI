@@ -87,9 +87,17 @@ class Controller
 				case '8': // Sala de espera para entrar al modo multijugador.
 					View::matchmaking();
 					break;
+                    
 				case '9': //  Pantalla MULTIJUGADOR
-				
+                    View::mpGameScreen(8081, Session::getVar('userID'));
 					break;
+                    
+                case '10': //Multijugador postpartido
+                    $resultado = $var['ac'];
+                    $res = explode('-', $resultado);
+                    View::mpPostPartido($res[0], $res[1]);
+                    break;
+                    
 				case '7': // Carga la SIGUIENTE pregunta del juego.
 					if (!Session::getVar('matchID')) { 
 						exit('Todavia no ha comenzado la partida!');

@@ -35,6 +35,12 @@ class Facade
         return DataBase::execute($query);
     }
     
+    public static function getUserFromID($id)
+	{
+		$query = "SELECT name FROM Usuario WHERE id=".$id."";  
+		return DataBase::execute($query);
+	}
+    
     ################ OBTENER INFO DE PREGUNTAS ##################
     
     /* Devuleve n preguntas del tema t*/

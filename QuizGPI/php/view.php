@@ -46,9 +46,14 @@ class View
             case 'gameScreen':
 				$path = 'html/game.html';
 				break;
-				
+			case 'mpgameScreen':
+				$path = 'html/mpgame.html';
+				break;
 			case 'postPartido':
 				$path = 'html/postpartido.html';
+				break;
+            case 'mpPostPartido':
+				$path = 'html/mppostpartido.html';
 				break;
 			case 'ranking':
 				$path =  'html/ranking.html';
@@ -87,6 +92,28 @@ class View
     public static function gameScreen()
     {
 		$text = View::getHtml('gameScreen');
+		echo $text;
+	}
+    
+    /* Carga la pantalla del juego multijugador*/
+    public static function mpGameScreen($port, $playerID)
+    {
+		$text = View::getHtml('mpgameScreen');
+        $text = str_replace("##PORT##", $port, $text); 
+        $text = str_replace("##PLAYERID##", $playerID, $text); 
+		echo $text;
+	}
+    
+    /* Carga la pantalla de postpartido Multijugador */
+	public static function mpPostPartido($resultado, $puntuacion) { 
+		$text = View::getHtml('mpPostPartido');
+        if($resultado == '1'){
+            $text = str_replace("##RESULTADO##", '¡HAS GANADO!', $text); 
+        }else{
+            $text = str_replace("##RESULTADO##", 'HAS PERDIDO', $text); 
+        }
+        
+        $text = str_replace("##puntuacion##", $puntuacion, $text); 
 		echo $text;
 	}
 	
